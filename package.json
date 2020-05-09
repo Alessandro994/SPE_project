@@ -1,0 +1,24 @@
+{
+  "name": "spe_project",
+  "version": "1.0.0",
+  "description": "The repository for the final project of the SPE course.",
+  "main": "script.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "webpack": "webpack"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Alessandro994/SPE_project.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Alessandro994/SPE_project/issues"
+  },
+  "homepage": "https://github.com/Alessandro994/SPE_project#readme",
+  "devDependencies": {
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.11"
+  }
+}
