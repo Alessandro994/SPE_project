@@ -4,8 +4,7 @@
   "description": "The repository for the final project of the SPE course.",
   "main": "script.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "webpack": "webpack"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
@@ -16,9 +15,5 @@
   "bugs": {
     "url": "https://github.com/Alessandro994/SPE_project/issues"
   },
-  "homepage": "https://github.com/Alessandro994/SPE_project#readme",
-  "devDependencies": {
-    "webpack": "^4.43.0",
-    "webpack-cli": "^3.3.11"
-  }
+  "homepage": "https://github.com/Alessandro994/SPE_project#readme"
 }
