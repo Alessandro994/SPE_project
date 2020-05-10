@@ -30,4 +30,10 @@ If you want to disable auto-start of Nginx at startup of computer:
 sudo systemctl disable nginx
 ```
 
+### Start simulation
+
 nginx -c nginx.conf -p "$PWD"
+
+docker-compose up
+
+k6 run script.js --out influxdb --duration 20s
