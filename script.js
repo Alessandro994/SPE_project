@@ -1,7 +1,9 @@
 import http from 'k6/http';
 import { check } from 'k6';
+import { Gauge } from 'k6/metrics';
 
-// VU Init is run only once per VU.
+// Custom metric to save the server id as tag
+var response_time_gauge = new Gauge('response_time');
 
 // VU code which is run over and over for as long as the test is running.
 export default function () {
@@ -11,9 +13,11 @@ export default function () {
     res,
     { "is status 200": r => r.status === 200 },
     {
-      server_id: res.headers.server_id
+      server_id: res.headers["X-Server-Id"]
     }
   );
+
+  response_time_gauge.add(res.timings.duration, {server_id: res.headers["X-Server-Id"]})
 
   // sleep(1);
 }

@@ -41,7 +41,7 @@ if (serverId === undefined) {
 
 app.get('/', function (req, res) {
     setTimeout(() => {
-        res.header('server_id', serverId);
+        res.header('X-Server-Id', serverId);
         res.status(200).send();
     }, getResponseTime(lambda));
 });
