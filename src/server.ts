@@ -1,8 +1,7 @@
 import express = require('express');
 import {MersenneTwister19937, Random} from "random-js";
 
-const LAMBDA = 1;
-
+let lambda: number;
 let random: Random;
 let responseTime: number;
 
@@ -19,10 +18,18 @@ if (seed === undefined) {
     random = new Random(MersenneTwister19937.seed(parseInt(seed)));
 }
 
+// Set exponential distribution parameter lambda
+const lambdaParam = process.env.LAMBDA;
+if (lambdaParam === undefined) {
+    lambda = 1;
+} else {
+    lambda = parseInt(lambdaParam)
+}
+
 // Set server response time
 const staticResponseTime = process.env.STATIC_RESPONSE_TIME;
 if (staticResponseTime === undefined) {
-    responseTime = getRandomResponseTime();
+    responseTime = getRandomResponseTime(lambda);
 } else {
     responseTime = parseInt(staticResponseTime);
 }
@@ -47,7 +54,7 @@ app.listen(port, function () {
 /**
  * Generate a random number from an exponential distribution.
  */
-function getRandomResponseTime(): number {
+function getRandomResponseTime(lambda: number): number {
     const value = random.realZeroToOneInclusive();
-    return -Math.log(value) / LAMBDA
+    return -Math.log(value) / lambda
 }
