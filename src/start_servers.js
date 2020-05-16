@@ -31,7 +31,9 @@ function startServers() {
 
         // clone the actual env vars to avoid overrides
         var env = Object.create(process.env);
+        // Set the server port and id via environment variable
         env.PORT = startingPort + index;
+        env.SERVER_ID = index;
 
         const server = spawn('node', ["build/server.js"], { env: env });
 
