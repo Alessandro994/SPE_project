@@ -2,10 +2,12 @@
   "name": "spe_project",
   "version": "1.0.0",
   "description": "The SPE final project.",
-  "main": "server.js",
+  "main": "src/start_servers.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "tsc": "tsc"
+    "tsc": "tsc",
+    "preserver": "tsc",
+    "server": "node src/start_servers.js"
   },
   "repository": {
     "type": "git",
