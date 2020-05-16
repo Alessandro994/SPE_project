@@ -1,19 +1,37 @@
 import express = require('express');
 import {MersenneTwister19937, Random} from "random-js";
 
-const SEED = 3;
 const LAMBDA = 1;
-let responseTime = 0;
+
+let random: Random;
+let responseTime: number;
 
 // Create a new express application instance
 const app: express.Application = express();
 
-const args = process.argv.slice(2);
-if (args.length > 0) {
-    const random = new Random(MersenneTwister19937.seed(SEED));
-    const value = random.realZeroToOneInclusive();
-    responseTime = -Math.log(value) / LAMBDA
-    console.log('Random response time amounts at ', responseTime);
+// Seed init
+const seed = process.env.SEED
+if (seed === undefined) {
+    // Auto initialize seed
+    random = new Random(MersenneTwister19937.autoSeed());
+} else {
+    // Use value provided as env variable
+    random = new Random(MersenneTwister19937.seed(parseInt(seed)));
+}
+
+// Set server response time
+const staticResponseTime = process.env.STATIC_RESPONSE_TIME;
+if (staticResponseTime === undefined) {
+    responseTime = getRandomResponseTime();
+} else {
+    responseTime = parseInt(staticResponseTime);
+}
+
+// Port configuration
+const port = process.env.PORT
+if (port === undefined) {
+    console.error('Server port must be specified.')
+    process.exit(1)
 }
 
 app.get('/', function (req, res) {
@@ -22,13 +40,14 @@ app.get('/', function (req, res) {
     }, responseTime);
 });
 
-const port = process.env.PORT
-
-if (port === undefined) {
-    console.error('Server port must be specified.')
-    process.exit(1)
-}
-
 app.listen(port, function () {
     console.log('Example app listening on port ' + port + '!');
 });
+
+/**
+ * Generate a random number from an exponential distribution.
+ */
+function getRandomResponseTime(): number {
+    const value = random.realZeroToOneInclusive();
+    return -Math.log(value) / LAMBDA
+}

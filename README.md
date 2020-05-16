@@ -49,9 +49,19 @@ k6 run script.js --out influxdb --duration 20s
 # Server configuration
 
 Servers are implemented with Node Express and TypeScript.
-
 The first time you have to run `npm install` to install the project dependencies.
 
 If you edit the `server.ts` file, then run `npm run tsc` to compile it. The result will be located in the `build` folder.
 
+## Environment variables
+* `PORT`*: the port the requests are sent to
+* `SEED`: a value that can be provided to produce consistent results. If not defined, the pseudorandom number generator uses the current date under-the-hood.
+* `STATIC_RESPONSE_TIME` = the time after which the server responds to a request. If not defined, the server draws a random values from an exponential distribution.
 
+
+
+## Boostrap
+To start NGINX and the servers run the following command in a shell. The environment variables have to be declared inline before the script.
+```
+<environment-var> npm run server
+```
