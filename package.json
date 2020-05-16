@@ -22,6 +22,7 @@
   "dependencies": {
     "@types/express": "^4.17.6",
     "express": "^4.17.1",
+    "mustache": "^4.0.1",
     "random-js": "^2.1.0",
     "typescript": "^3.8.3"
   }

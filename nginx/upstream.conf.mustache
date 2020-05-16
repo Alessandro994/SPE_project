@@ -1,0 +1,5 @@
+upstream app {
+{{#servers}}
+  server localhost:{{port}};
+{{/servers}}
+}
