@@ -9,7 +9,7 @@ let responseTime: number;
 const app: express.Application = express();
 
 // Seed init
-const seed = process.env.SEED
+const seed = process.env.SEED;
 if (seed === undefined) {
     // Auto initialize seed
     random = new Random(MersenneTwister19937.autoSeed());
@@ -23,28 +23,27 @@ const lambdaParam = process.env.LAMBDA;
 if (lambdaParam === undefined) {
     lambda = 1;
 } else {
-    lambda = parseInt(lambdaParam)
+    lambda = parseFloat(lambdaParam);
 }
 
-// Set server response time
-const staticResponseTime = process.env.STATIC_RESPONSE_TIME;
-if (staticResponseTime === undefined) {
-    responseTime = getRandomResponseTime(lambda);
-} else {
-    responseTime = parseInt(staticResponseTime);
-}
-
-// Port configuration
-const port = process.env.PORT
+// Get port from script
+const port = process.env.PORT;
 if (port === undefined) {
-    console.error('Server port must be specified.')
-    process.exit(1)
+    console.error('Server port must be specified.');
+    process.exit(1);
+}
+
+const serverId = process.env.SERVER_ID;
+if (serverId === undefined) {
+    console.error('Server ID must be specified.')
+    process.exit(1);
 }
 
 app.get('/', function (req, res) {
     setTimeout(() => {
+        res.header('server_id', serverId);
         res.status(200).send();
-    }, responseTime);
+    }, getResponseTime(lambda));
 });
 
 app.listen(port, function () {
@@ -52,9 +51,18 @@ app.listen(port, function () {
 });
 
 /**
- * Generate a random number from an exponential distribution.
+ * Generate a reponse time.
+ * If not specified, the response time is drawn from an exponential distribution.
  */
-function getRandomResponseTime(lambda: number): number {
-    const value = random.realZeroToOneInclusive();
-    return -Math.log(value) / lambda
+function getResponseTime(lambda: number): number {
+
+    const staticResponseTime = process.env.STATIC_RESPONSE_TIME;
+    if (staticResponseTime === undefined) {
+        const value = random.realZeroToOneInclusive();
+        responseTime = -Math.log(1 - value) / lambda;
+    } else {
+        responseTime = parseInt(staticResponseTime);
+    }
+
+    return responseTime;
 }
