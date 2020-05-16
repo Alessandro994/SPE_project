@@ -1,6 +1,7 @@
 import express = require('express');
 import {MersenneTwister19937, Random} from "random-js";
 
+const SEED = 3;
 const LAMBDA = 1;
 let responseTime = 0;
 
@@ -9,7 +10,7 @@ const app: express.Application = express();
 
 const args = process.argv.slice(2);
 if (args.length > 0) {
-    const random = new Random(MersenneTwister19937.autoSeed());
+    const random = new Random(MersenneTwister19937.seed(SEED));
     const value = random.realZeroToOneInclusive();
     responseTime = -Math.log(value) / LAMBDA
     console.log('Random response time amounts at ', responseTime);
@@ -17,7 +18,7 @@ if (args.length > 0) {
 
 app.get('/', function (req, res) {
     setTimeout(() => {
-        res.send('Hello World!');
+        res.status(200).send();
     }, responseTime);
 });
 
