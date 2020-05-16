@@ -55,10 +55,12 @@ If you edit the `server.ts` file, then run `npm run tsc` to compile it. The resu
 
 ## Environment variables
 * `PORT`*: the port the requests are sent to
+* `SERVER_ID`*: the server identifier
 * `SEED`: a value that can be provided to produce consistent results. If not defined, the pseudorandom number generator uses the current date under-the-hood.
 * `STATIC_RESPONSE_TIME`: the time after which the server responds to a request. If not defined, the server draws a random values from an exponential distribution.
 * `LAMBDA`: the lambda parameter of the exponential distribution. Default = 1.
 
+Variables with * are automatically provided by the Bash script that boostrap the servers.
 
 ## Boostrap
 To start NGINX and the servers run the following command in a shell. The environment variables have to be declared inline before the script.
