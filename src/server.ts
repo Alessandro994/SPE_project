@@ -56,12 +56,18 @@ app.listen(port, function () {
  */
 function getResponseTime(lambda: number): number {
 
-    const staticResponseTime = process.env.STATIC_RESPONSE_TIME;
-    if (staticResponseTime === undefined) {
-        const value = random.realZeroToOneInclusive();
-        responseTime = -Math.log(1 - value) / lambda;
+    const minResponseTime = process.env.MIN_RESPONSE_TIME;
+    if (minResponseTime === undefined) {
+        console.error('Minimum response time must be defined.')
+        process.exit(1);
     } else {
-        responseTime = parseInt(staticResponseTime);
+        const expResponseTime = process.env.EXP_RESPONSE_TIME;
+        if (expResponseTime === undefined) {
+            responseTime = parseInt(minResponseTime);
+        } else {
+            const value = random.realZeroToOneInclusive();
+            responseTime = (-Math.log(1 - value) / lambda) + parseInt(minResponseTime);
+        }
     }
 
     return responseTime;
