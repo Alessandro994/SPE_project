@@ -65,8 +65,13 @@ function getResponseTime(lambda: number): number {
         if (expResponseTime === undefined) {
             responseTime = parseInt(minResponseTime);
         } else {
-            const value = random.realZeroToOneInclusive();
-            responseTime = (-Math.log(1 - value) / lambda) + parseInt(minResponseTime);
+            if (expResponseTime === 'true') {
+                const value = random.realZeroToOneInclusive();
+                responseTime = (-Math.log(1 - value) / lambda) + parseInt(minResponseTime);
+            } else {
+                console.error('Invalid value for EXP_RESPONSE_TIME.')
+                process.exit(1);
+            }
         }
     }
 
