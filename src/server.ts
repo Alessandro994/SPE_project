@@ -39,6 +39,17 @@ if (serverId === undefined) {
     process.exit(1);
 }
 
+const minResponseTime = process.env.MIN_RESPONSE_TIME as string;
+if (minResponseTime === undefined) {
+    console.error('MIN_RESPONSE_TIME must be specified.')
+    process.exit(1);
+}
+
+const expResponseTime = process.env.EXP_RESPONSE_TIME;
+if (expResponseTime === undefined) {
+    console.info("Using static response time");
+}
+
 app.get('/', function (req, res) {
     setTimeout(() => {
         res.header('X-Server-Id', serverId);
@@ -47,31 +58,24 @@ app.get('/', function (req, res) {
 });
 
 app.listen(port, function () {
-    console.log('Example app listening on port ' + port + '!');
+    console.info(`Server ${serverId} listening on port ${port}`);
 });
 
 /**
- * Generate a reponse time.
+ * Generate a response time.
  * If not specified, the response time is drawn from an exponential distribution.
  */
 function getResponseTime(lambda: number): number {
 
-    const minResponseTime = process.env.MIN_RESPONSE_TIME;
-    if (minResponseTime === undefined) {
-        console.error('Minimum response time must be defined.')
-        process.exit(1);
+    if (expResponseTime === undefined) {
+        responseTime = parseInt(minResponseTime);
     } else {
-        const expResponseTime = process.env.EXP_RESPONSE_TIME;
-        if (expResponseTime === undefined) {
-            responseTime = parseInt(minResponseTime);
+        if (expResponseTime === 'true') {
+            const value = random.realZeroToOneInclusive();
+            responseTime = (-Math.log(1 - value) / lambda) + parseInt(minResponseTime) * (-Math.log(1 - value) / lambda);
         } else {
-            if (expResponseTime === 'true') {
-                const value = random.realZeroToOneInclusive();
-                responseTime = (-Math.log(1 - value) / lambda) + parseInt(minResponseTime);
-            } else {
-                console.error('Invalid value for EXP_RESPONSE_TIME.')
-                process.exit(1);
-            }
+            console.error('Invalid value for EXP_RESPONSE_TIME.')
+            process.exit(1);
         }
     }
 
