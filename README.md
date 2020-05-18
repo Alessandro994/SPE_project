@@ -26,6 +26,13 @@ sudo systemctl disable nginx
 The fastest way is to download the binary file from GitHub at the following [link](https://github.com/loadimpact/k6/releases). Install the binary in your PATH to run k6 from any location. This can be, for example, `/usr/local/bin`.
 
 
+## Node
+
+```bash
+
+nvm install --lts=Erbium
+
+```
 
 # Start simulation
 

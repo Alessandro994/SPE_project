@@ -2,12 +2,14 @@
   "name": "spe_project",
   "version": "1.0.0",
   "description": "The SPE final project.",
-  "main": "src/start_servers.js",
+  "main": "src/start_simulation.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "tsc": "tsc",
-    "preserver": "tsc",
-    "server": "node src/start_servers.js"
+    "preservers": "tsc",
+    "servers": "node build/servers.js",
+    "presimulation": "tsc",
+    "simulation": "node build/start_simulation.js"
   },
   "repository": {
     "type": "git",
@@ -21,9 +23,10 @@
   "homepage": "https://github.com/Alessandro994/SPE_project#readme",
   "dependencies": {
     "@types/express": "^4.17.6",
+    "@types/mustache": "^4.0.1",
     "express": "^4.17.1",
     "mustache": "^4.0.1",
     "random-js": "^2.1.0",
-    "typescript": "^3.8.3"
+    "typescript": "^3.9.2"
   }
 }
