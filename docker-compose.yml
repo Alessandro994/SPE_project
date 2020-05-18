@@ -7,6 +7,7 @@ services:
       - "8086:8086"
     environment:
       - INFLUXDB_DB=k6
+      - INFLUXDB_HTTP_FLUX_ENABLED=true
     volumes:
       - influxdb:/var/lib/influxdb
 
@@ -22,6 +23,15 @@ services:
       - ./grafana-datasource.yml:/etc/grafana/provisioning/datasources/datasource.yaml
       - grafana:/var/lib/grafana
 
+  chronograf:
+    image: chronograf
+    command: --influxdb-url=http://influxdb:8086
+    ports:
+    - 8888:8888
+    volumes:
+    - chronograf:/var/lib/chronograf
+
 volumes:
   influxdb: {}
   grafana: {}
+  chronograf: {}
