@@ -1,5 +1,4 @@
-import * as child_process from 'child_process';
-import { ChildProcess } from 'child_process';
+import { spawn, ChildProcess } from 'child_process';
 import * as fs from 'fs';
 import mustache from 'mustache';
 
@@ -12,7 +11,7 @@ if (!NUM_SERVERS) {
 export function startNginx() {
     console.info("Starting nginx on port 8080");
     // Inherit stdout and stdin from parent process
-    const nginx = child_process.spawn('nginx', ["-c", "nginx.conf", "-p", process.cwd()], { stdio: 'inherit' });
+    const nginx = spawn('nginx', ["-c", "nginx.conf", "-p", process.cwd()], { stdio: 'inherit' });
 
     // nginx.stdout.on('data', (data) => {
     //     console.log(`${data}`);
@@ -21,6 +20,8 @@ export function startNginx() {
     // nginx.stderr.on('data', (data) => {
     //     console.log(`${data}`);
     // });
+
+    return nginx;
 }
 
 const startingPort = 8081;
@@ -34,7 +35,7 @@ export function startServers() {
         env.PORT = startingPort + index;
         env.SERVER_ID = index;
 
-        const server = child_process.spawn('node', ["build/server.js"], { env: env });
+        const server = spawn('node', ["build/server.js"], { env: env });
         serverProcesses.push(server);
 
         server.stdout.on('data', (data: any) => {
@@ -45,10 +46,6 @@ export function startServers() {
             console.log(`${data}`);
         });
 
-        server.on('close', (code: any) => {
-            console.log(`Server ${index} exited with code ${code}`);
-            stopProcesses(serverProcesses);
-        });
     }
     return serverProcesses;
 }
@@ -70,18 +67,3 @@ function writeNginxConf() {
     const upstreamConfiguration = mustache.render(template.toString(), variables);
     fs.writeFileSync("nginx/upstream.conf", upstreamConfiguration);
 }
-
-
-function stopProcesses(processes: Array<ChildProcess>) {
-    processes.forEach(process => {
-        console.log(`Stopping process ${process.pid}`);
-        process.kill()
-    })
-}
-
-// exports.startNginx = startNginx;
-// exports.startServers = startServers;
-
-writeNginxConf();
-startNginx();
-startServers();
