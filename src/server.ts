@@ -9,14 +9,8 @@ let responseTime: number;
 const app: express.Application = express();
 
 // Seed init
-const seed = process.env.SEED;
-if (seed === undefined) {
-    // Auto initialize seed
-    random = new Random(MersenneTwister19937.autoSeed());
-} else {
-    // Use value provided as env variable
-    random = new Random(MersenneTwister19937.seed(parseInt(seed)));
-}
+const seed = process.env.SEED!;
+random = new Random(MersenneTwister19937.seed(parseInt(seed)));
 
 // Set exponential distribution parameter lambda
 const lambdaParam = process.env.LAMBDA;
@@ -72,7 +66,7 @@ function getResponseTime(lambda: number): number {
     } else {
         if (expResponseTime === 'true') {
             const value = random.realZeroToOneInclusive();
-            responseTime = (-Math.log(1 - value) / lambda) + parseInt(minResponseTime) * (-Math.log(1 - value) / lambda);
+            responseTime = (-Math.log(1 - value) / lambda) + parseInt(minResponseTime);
         } else {
             console.error('Invalid value for EXP_RESPONSE_TIME.')
             process.exit(1);
