@@ -1,11 +1,12 @@
-import {ChildProcess} from 'child_process';
-import {k6, startNginx, startServers} from './process';
+import { ChildProcess } from 'child_process';
+import { k6, startNginx, startServers } from './process';
 
 let iterations = process.env.ITERATIONS as string;
 // By default we do 1 iteration
 if (iterations == undefined) {
     iterations = "1"
 }
+console.info(`Total iterations: ${iterations}`);
 
 // const tag = process.env.SIMULATION
 // if (tag === undefined) {
@@ -13,8 +14,8 @@ if (iterations == undefined) {
 //     process.exit(1);
 // }
 
-for (let i = 0; i < Number.parseInt(iterations); i++) {
-    console.info(`Starting iteration ${i}`);
+async function runSimulation(iteration: Number) {
+    console.info(`Starting iteration ${iteration}`);
 
     let processes = Array<ChildProcess>();
     processes.push(startNginx());
@@ -22,16 +23,35 @@ for (let i = 0; i < Number.parseInt(iterations); i++) {
 
     processes.forEach(process => {
         process.on('close', (code, signal) => {
-            console.log(`Process exited with code ${code}. Shutting down simulation`)
-            stopSimulation(processes, true)
+            if (code) {
+                console.log(`Process exited with code ${code}. Shutting down simulation`)
+                stopSimulation(processes, true)
+            }
         })
     });
 
-    k6().then((output) => console.log(output.stdout))
-        .finally(() => stopSimulation(processes));
+    return k6().then((output) => console.log(output.stdout))
+        .finally(() => {
+            console.info(`Finished iteration ${iteration}`);
+            stopSimulation(processes);
+        });
+
 }
 
 function stopSimulation(processes: Array<ChildProcess>, failure = false) {
     processes.forEach(process => process.kill())
-    process.exit(failure ? 1 : 0)
+
+    if (failure) {
+        process.exit(1)
+    }
 }
+
+
+async function main() {
+    for (let i = 0; i < Number.parseInt(iterations); i++) {
+        await runSimulation(i);
+    }
+    console.log("Finished simulation");
+}
+
+main()
