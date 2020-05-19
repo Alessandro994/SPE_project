@@ -112,3 +112,6 @@ temp/
 
 # Compiled Typescript
 build
+
+# VSCode user settings
+.vscode/settings.json

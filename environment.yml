@@ -7,5 +7,4 @@ dependencies:
   - ciso8601
   - pandas
   - matplotlib
-  - influxdb-client
 
