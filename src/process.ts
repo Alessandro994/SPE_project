@@ -41,8 +41,10 @@ export function startServers() {
     let random;
     const seed = process.env.SEED
     if (seed === undefined) {
+        console.log(`Using seed ${seed}`)
         random = new Random(MersenneTwister19937.autoSeed())
     } else {
+        console.log("Using random seed")
         random = new Random(MersenneTwister19937.seed(parseInt(seed)))
     }
 
@@ -92,7 +94,7 @@ function writeNginxConf() {
     console.log("Written Nginx configuration");
 }
 
-export async function k6(tag: K6Tag) {
+export async function k6(tag?: K6Tag) {
     console.info("Starting k6");
-    return promisify(exec)(`k6 run --out influxdb script.js --tag ${tag.name}=${tag.value}`);
+    return promisify(exec)(`k6 run --out influxdb src/http_requests.js`);
 }

@@ -7,11 +7,11 @@ if (iterations == undefined) {
     iterations = "1"
 }
 
-const tag = process.env.SIMULATION
-if (tag === undefined) {
-    console.error('Tag of the simulation must be specified.')
-    process.exit(1);
-}
+// const tag = process.env.SIMULATION
+// if (tag === undefined) {
+//     console.error('SIMULATION need to be specified')
+//     process.exit(1);
+// }
 
 for (let i = 0; i < Number.parseInt(iterations); i++) {
     console.info(`Starting iteration ${i}`);
@@ -27,7 +27,7 @@ for (let i = 0; i < Number.parseInt(iterations); i++) {
         })
     });
 
-    k6({name: 'simulation', value: tag}).then((output) => console.log(output.stdout))
+    k6().then((output) => console.log(output.stdout))
         .finally(() => stopSimulation(processes));
 }
 

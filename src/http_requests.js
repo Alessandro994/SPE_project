@@ -6,7 +6,10 @@ import { Gauge } from 'k6/metrics';
 var response_time_gauge = new Gauge('response_time');
 
 export let options = {
-  systemTags: ["iter", "proto", "subproto", "status", "method", "url", "name", "group", "check", "error", "error_code", "tls_version"]
+  systemTags: ["iter", "proto", "subproto", "status", "method", "url", "name", "group", "check", "error", "error_code", "tls_version"],
+  tags: {
+    simulation: __ENV.SIMULATION
+  }
 };
 
 // VU code which is run over and over for as long as the test is running.
