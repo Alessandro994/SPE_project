@@ -3,6 +3,13 @@ The repository for the final project of the SPE course.
 
 # Setup
 
+## Conda
+Install the conda environment
+
+```bash
+conda env --file environment.yml
+```
+
 ## Nginx ([wiki](https://www.nginx.com/resources/wiki/start/))
 
 1. Run the following command to apppend the appropriate stanza to `/etc/apt/sources.list`, replacing `$release` with your Linux release (ex. `bionic`).
