@@ -39,7 +39,7 @@ To start a simulation, open three different shells.
 
 Start NGINX with the following command:
 ```
-nginx -c nginx.conf -p "$PWD"
+nginx -c nginx/nginx.conf -p "$PWD"
 ```
 
 Let Docker do the magic with:
