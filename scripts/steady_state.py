@@ -20,5 +20,4 @@ query_result = query_api.query_data_frame('from(bucket:"k6") '
                                         '|> range(start: -1h)'
                                         '|> filter(fn: (r) => r._measurement == "http_req_duration" and (r._field == "value"))'
                                         )
-# print(query_result['_value'])
 plot_autocorrelation_packet_in_sys(query_result['_value'])

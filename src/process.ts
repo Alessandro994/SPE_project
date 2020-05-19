@@ -5,6 +5,11 @@ import {MersenneTwister19937, Random} from 'random-js';
 import {promisify} from 'util';
 
 
+export interface K6Tag {
+    name: string;
+    value: string;
+}
+
 const NUM_SERVERS = process.env.NUM_SERVERS as string;
 if (!NUM_SERVERS) {
     throw new Error("Please define env variable NUM_SERVERS")
@@ -87,7 +92,7 @@ function writeNginxConf() {
     console.log("Written Nginx configuration");
 }
 
-export async function k6() {
+export async function k6(tag: K6Tag) {
     console.info("Starting k6");
-    return promisify(exec)('k6 run --out influxdb script.js');
+    return promisify(exec)(`k6 run --out influxdb script.js --tag ${tag.name}=${tag.value}`);
 }
