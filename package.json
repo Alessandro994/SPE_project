@@ -6,8 +6,6 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "tsc": "tsc",
-    "preservers": "tsc",
-    "servers": "node build/servers.js",
     "presimulation": "tsc",
     "simulation": "node build/start_simulation.js"
   },

@@ -1,6 +1,8 @@
-import { spawn, ChildProcess } from 'child_process';
+import { spawn, ChildProcess, exec } from 'child_process';
 import * as fs from 'fs';
 import mustache from 'mustache';
+import {promisify} from 'util';
+
 
 
 const NUM_SERVERS = process.env.NUM_SERVERS as string;
@@ -9,6 +11,8 @@ if (!NUM_SERVERS) {
 }
 
 export function startNginx() {
+    writeNginxConf();
+
     console.info("Starting nginx on port 8080");
     // Inherit stdout and stdin from parent process
     const nginx = spawn('nginx', ["-c", "nginx.conf", "-p", process.cwd()], { stdio: 'inherit' });
@@ -66,4 +70,10 @@ function writeNginxConf() {
 
     const upstreamConfiguration = mustache.render(template.toString(), variables);
     fs.writeFileSync("nginx/upstream.conf", upstreamConfiguration);
+    console.log("Written Nginx configuration");
+}
+
+export async function k6() {
+    console.info("Starting k6");
+    return promisify(exec)('k6 run --out influxdb script.js');
 }
