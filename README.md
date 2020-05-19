@@ -28,10 +28,9 @@ The fastest way is to download the binary file from GitHub at the following [lin
 
 ## Node
 
+Install an updated version of NodeJS using `nvm`
 ```bash
-
 nvm install --lts=Erbium
-
 ```
 
 # Start simulation
@@ -70,8 +69,10 @@ If you edit the `server.ts` file, then run `npm run tsc` to compile it. The resu
 
 Variables with * are automatically provided by the Bash script that boostrap the servers.
 
-## Boostrap
-To start NGINX and the servers run the following command in a shell. The environment variables have to be declared inline before the script.
-```
-<environment-var> npm run server
+## Start simulation
+To start a simulation run, run the following command.
+The environment variables need to be declared inline before the script.
+
+```bash
+MIN_RESPONSE_TIME=100 NUM_SERVERS=1 npm run simulation
 ```

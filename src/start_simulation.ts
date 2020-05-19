@@ -17,7 +17,7 @@ for (let i = 0; i < Number.parseInt(iterations); i++) {
     processes.forEach(process => {
         process.on('close', (code, signal) => {
             console.log(`Process exited with code ${code}. Shutting down simulation`)
-            stopSimulation(processes)
+            stopSimulation(processes, true)
         })
     });
 
@@ -25,7 +25,7 @@ for (let i = 0; i < Number.parseInt(iterations); i++) {
     .finally(() => stopSimulation(processes));
 }
 
-function stopSimulation(processes: Array<ChildProcess>) {
+function stopSimulation(processes: Array<ChildProcess>, failure=false) {
     processes.forEach(process => process.kill())
-    process.exit(1)
+    process.exit(failure? 1: 0)
 }
