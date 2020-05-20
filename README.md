@@ -83,3 +83,10 @@ The environment variables need to be declared inline before the script.
 ```bash
 MIN_RESPONSE_TIME=100 NUM_SERVERS=1 npm run simulation
 ```
+
+
+## Cleanup DB
+Clear all series in influxdb
+```bash
+docker-compose exec influxdb influx -database k6 -execute 'DROP SERIES FROM /.*/'
+```
