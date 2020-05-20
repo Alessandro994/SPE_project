@@ -3,7 +3,6 @@ import pandas as pd
 from influxdb_client import Dialect, InfluxDBClient, Point
 from influxdb_client.client.write_api import SYNCHRONOUS
 from matplotlib import pyplot as plt
-from statsmodels.graphics.tsaplots import plot_acf
 
 client = InfluxDBClient(url="http://localhost:8086",
                         token="my-token", org="BBM SpA")
