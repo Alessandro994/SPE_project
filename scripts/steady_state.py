@@ -1,10 +1,16 @@
+import math
 import os
 
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 from influxdb_client import Dialect, InfluxDBClient, Point
 from influxdb_client.client.write_api import SYNCHRONOUS
 from matplotlib import pyplot as plt
+from scipy.stats import t
+
+NUM_BATCH = 50
+CI_LEVEL = 0.05
 
 SIMULATION_ID_FILE = "build/simulation.txt"
 
@@ -29,6 +35,26 @@ query_result = query_api.query_data_frame('import "experimental"'
                                           '|> sort(columns: ["_time"], desc: false)'
                                           )
 
-ax = pd.plotting.autocorrelation_plot(query_result['_value'])
-ax.set_xlim([0, 1000])
-plt.show()
+values = query_result['_value']
+
+# Plot sample ACF
+# ax = pd.plotting.autocorrelation_plot(values)
+# ax.set_xlim([0, 1000])
+# plt.show()
+
+durations = values.to_numpy()
+batches = np.split(durations, 50)
+
+batches_mean = [np.mean(b) for b in batches]
+grand_batches_mean = np.mean(batches_mean)
+
+batches_mean_est = sum(
+    [(b - grand_batches_mean)**2 for b in batches_mean]) / (NUM_BATCH - 1)
+
+t_quantile = t.ppf(1 - CI_LEVEL, df=NUM_BATCH - 1)
+ci_min = grand_batches_mean - \
+    (t_quantile * math.sqrt(batches_mean_est / NUM_BATCH))
+ci_max = grand_batches_mean + \
+    (t_quantile * math.sqrt(batches_mean_est / NUM_BATCH))
+
+print(f'CI for mean: [{ci_min}, {ci_max}].')
