@@ -41,10 +41,10 @@ export function startServers() {
     let random;
     const seed = process.env.SEED
     if (seed === undefined) {
-        console.log(`Using seed ${seed}`)
+        console.log("Using random seed")
         random = new Random(MersenneTwister19937.autoSeed())
     } else {
-        console.log("Using random seed")
+        console.log(`Using seed ${seed}`)
         random = new Random(MersenneTwister19937.seed(parseInt(seed)))
     }
 
