@@ -38,7 +38,7 @@ async function runSimulation(iteration: Number) {
         })
     });
 
-    return k6(simulationID).then((output) => console.log(output.stdout))
+    return k6(simulationID)
         .finally(() => {
             console.info(`Finished iteration ${iteration}`);
             stopSimulation(processes);

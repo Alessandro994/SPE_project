@@ -100,5 +100,5 @@ export async function k6(simulationID: Number, tag?: K6Tag) {
     const env = Object.create(process.env);
     // Set the simulation id
     env.SIMULATION = simulationID;
-    return promisify(exec)(`k6 run --out influxdb src/http_requests.js`, {env: env});
+    return promisify(spawn)(`k6`, ['run', '--out', 'influxdb', 'src/http_requests.js'], {env: env, stdio: "inherit"});
 }
