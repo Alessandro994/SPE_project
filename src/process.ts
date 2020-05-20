@@ -94,7 +94,11 @@ function writeNginxConf() {
     console.log("Written Nginx configuration");
 }
 
-export async function k6(tag?: K6Tag) {
+export async function k6(simulationID: Number, tag?: K6Tag) {
     console.info("Starting k6");
-    return promisify(exec)(`k6 run --out influxdb src/http_requests.js`);
+    // clone the actual env vars to avoid overrides
+    const env = Object.create(process.env);
+    // Set the simulation id
+    env.SIMULATION = simulationID;
+    return promisify(exec)(`k6 run --out influxdb src/http_requests.js`, {env: env});
 }

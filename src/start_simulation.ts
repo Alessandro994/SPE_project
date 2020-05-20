@@ -1,18 +1,26 @@
 import { ChildProcess } from 'child_process';
 import { k6, startNginx, startServers } from './process';
+import * as fs from 'fs';
 
 let iterations = process.env.ITERATIONS as string;
 // By default we do 1 iteration
 if (iterations == undefined) {
     iterations = "1"
 }
-console.info(`Total iterations: ${iterations}`);
+// File containing the last simulation
+const SIMULATION_ID_FILE="build/simulation.txt"
 
-// const tag = process.env.SIMULATION
-// if (tag === undefined) {
-//     console.error('SIMULATION need to be specified')
-//     process.exit(1);
-// }
+// Initialize the file the first time
+if (!fs.existsSync(SIMULATION_ID_FILE)) {
+    fs.writeFileSync(SIMULATION_ID_FILE, "0");
+}
+// Increment simulationID
+let simulationID = Number.parseInt(fs.readFileSync(SIMULATION_ID_FILE, {encoding: "utf8"}));
+simulationID+=1
+fs.writeFileSync(SIMULATION_ID_FILE, simulationID);
+
+console.info(`Simulation ID: ${simulationID}`)
+console.info(`Total iterations: ${iterations}`)
 
 async function runSimulation(iteration: Number) {
     console.info(`Starting iteration ${iteration}`);
@@ -30,7 +38,7 @@ async function runSimulation(iteration: Number) {
         })
     });
 
-    return k6().then((output) => console.log(output.stdout))
+    return k6(simulationID).then((output) => console.log(output.stdout))
         .finally(() => {
             console.info(`Finished iteration ${iteration}`);
             stopSimulation(processes);
