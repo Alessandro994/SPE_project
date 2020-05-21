@@ -15,6 +15,14 @@ if (!NUM_SERVERS) {
     throw new Error("Please define env variable NUM_SERVERS")
 }
 
+let loadBalancing = process.env.LOAD_BALANCING
+if (!loadBalancing) {
+    console.info("Defaulting to random load balancing policy")
+    loadBalancing = "random"
+} else {
+    console.info(`Using ${loadBalancing} load balancing policy`)
+}
+
 export function startNginx() {
     writeNginxConf();
 
@@ -81,7 +89,8 @@ function writeNginxConf() {
     const template = fs.readFileSync("nginx/upstream.conf.mustache");
 
     const variables = {
-        servers: Array()
+        servers: Array(),
+        balancing_policy: loadBalancing
     };
 
     for (let index = 0; index < Number.parseInt(NUM_SERVERS); index++) {

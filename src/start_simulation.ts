@@ -22,7 +22,7 @@ fs.writeFileSync(SIMULATION_ID_FILE, simulationID);
 console.info(`Simulation ID: ${simulationID}`)
 console.info(`Total iterations: ${iterations}`)
 
-function runSimulation(iteration: Number) {
+async function runSimulation(iteration: Number) {
     console.info(`Starting iteration ${iteration}`);
 
     let processes = Array<ChildProcess>();
@@ -39,10 +39,17 @@ function runSimulation(iteration: Number) {
     });
 
     const k6Process = k6(simulationID)
-    k6Process.on('close', (code, signal) => {
-        console.info(`Finished iteration ${iteration}`);
-        stopSimulation(processes);
-    })
+    // Save reference to k6 process
+    processes.push(k6Process);
+
+    return new Promise((resolve, reject) => {
+        k6Process.on('close', (code, signal) => {
+            console.info(`Finished iteration ${iteration}`);
+            stopSimulation(processes);
+            resolve();
+        })
+    });
+
 
 }
 

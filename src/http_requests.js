@@ -8,7 +8,8 @@ var response_time_gauge = new Gauge('response_time');
 export let options = {
   systemTags: ["iter", "proto", "subproto", "status", "method", "url", "name", "group", "check", "error", "error_code", "tls_version"],
   tags: {
-    simulation: __ENV.SIMULATION
+    simulation: __ENV.SIMULATION,
+    load_balacing: __ENV.LOAD_BALANCING
   }
 };
 
