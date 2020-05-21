@@ -38,9 +38,9 @@ query_result = query_api.query_data_frame('import "experimental"'
 values = query_result['_value']
 
 # Plot sample ACF
-# ax = pd.plotting.autocorrelation_plot(values)
-# ax.set_xlim([0, 1000])
-# plt.show()
+ax = pd.plotting.autocorrelation_plot(values)
+ax.set_xlim([0, 1000])
+plt.show()
 
 durations = values.to_numpy()
 batches = np.split(durations, 50)
@@ -57,4 +57,5 @@ ci_min = grand_batches_mean - \
 ci_max = grand_batches_mean + \
     (t_quantile * math.sqrt(batches_mean_est / NUM_BATCH))
 
-print(f'CI for mean: [{ci_min}, {ci_max}].')
+print(f'Mean of response time: {grand_batches_mean:.2f}.')
+print(f'CI for mean: [{ci_min:.2f}, {ci_max:.2f}].')
