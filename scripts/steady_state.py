@@ -7,7 +7,7 @@ from influxdb_client import InfluxDBClient
 from matplotlib import pyplot as plt
 from scipy.stats import t
 
-NUM_BATCH = 50
+NUM_BATCH = 64
 CI_LEVEL = 0.05
 
 SIMULATION_ID_FILE = "build/simulation.txt"
@@ -42,7 +42,17 @@ plt.title(f'Sample ACF for simulation {SIMULATION_ID}.')
 plt.show()
 
 durations = values.to_numpy()
-batches = np.split(durations, 50)
+print(f'Initial number of samples: {len(durations)}.')
+
+modulo = len(durations) % NUM_BATCH
+
+# If the samples are not a multiple of the number of batches
+# remove a number of initial samples corresponding to the modulo.
+if modulo != 0:
+    durations = durations[modulo:]
+    print(f'Removing {modulo} samples to get an equal number of samples in each batch.')
+
+batches = np.split(durations, NUM_BATCH)
 
 batches_mean = [np.mean(b) for b in batches]
 grand_batches_mean = np.mean(batches_mean)
