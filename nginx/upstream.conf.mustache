@@ -1,7 +1,7 @@
 upstream app {
 # Repeat this block for each server
 {{#servers}}
-    server localhost:{{port}};
+    server localhost:{{port}} {{{param}}};
 {{/servers}}
     # Load balancing policy
     {{balancing_policy}};

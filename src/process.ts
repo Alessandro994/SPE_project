@@ -95,7 +95,7 @@ function writeNginxConf() {
 
     for (let index = 0; index < Number.parseInt(NUM_SERVERS); index++) {
         const port = startingPort + index;
-        variables.servers.push({port: port})
+        variables.servers.push({port: port, param: process.env.NGINX_SERVER_PARAM })
     }
 
     const upstreamConfiguration = mustache.render(template.toString(), variables);

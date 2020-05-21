@@ -82,6 +82,8 @@ The environment variables need to be declared inline before the script.
 
 ```bash
 MIN_RESPONSE_TIME=100 NUM_SERVERS=1 npm run simulation
+
+NGINX_SERVER_PARAM=max_conns=5 LOAD_BALANCING=least_conn NUM_SERVERS=2 MIN_RESPONSE_TIME=100 EXP_RESPONSE_TIME=true K6_ITERATIONS=10000 K6_VUS=20 LAMBDA=0.01 SEED=10 K6_RPS=100 npm run simulation
 ```
 
 
