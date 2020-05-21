@@ -1,5 +1,5 @@
-import { ChildProcess } from 'child_process';
-import { k6, startNginx, startServers } from './process';
+import {ChildProcess} from 'child_process';
+import {k6, startNginx, startServers} from './process';
 import * as fs from 'fs';
 
 let iterations = process.env.ITERATIONS as string;
@@ -8,7 +8,7 @@ if (iterations == undefined) {
     iterations = "1"
 }
 // File containing the last simulation
-const SIMULATION_ID_FILE="build/simulation.txt"
+const SIMULATION_ID_FILE = "build/simulation.txt"
 
 // Initialize the file the first time
 if (!fs.existsSync(SIMULATION_ID_FILE)) {
@@ -16,7 +16,7 @@ if (!fs.existsSync(SIMULATION_ID_FILE)) {
 }
 // Increment simulationID
 let simulationID = Number.parseInt(fs.readFileSync(SIMULATION_ID_FILE, {encoding: "utf8"}));
-simulationID+=1
+simulationID += 1
 fs.writeFileSync(SIMULATION_ID_FILE, simulationID);
 
 console.info(`Simulation ID: ${simulationID}`)

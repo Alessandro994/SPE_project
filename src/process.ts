@@ -1,8 +1,7 @@
-import {ChildProcess, exec, spawn} from 'child_process';
+import {ChildProcess, spawn} from 'child_process';
 import * as fs from 'fs';
 import mustache from 'mustache';
 import {MersenneTwister19937, Random} from 'random-js';
-import {promisify} from 'util';
 
 
 export interface K6Tag {
@@ -41,7 +40,8 @@ export function startNginx() {
     return nginx;
 }
 
-const startingPort = 8081;
+const startingPort = 5000;
+
 export function startServers() {
     const serverProcesses = new Array<ChildProcess>();
 
@@ -95,7 +95,7 @@ function writeNginxConf() {
 
     for (let index = 0; index < Number.parseInt(NUM_SERVERS); index++) {
         const port = startingPort + index;
-        variables.servers.push({port: port, param: process.env.NGINX_SERVER_PARAM })
+        variables.servers.push({port: port, param: process.env.NGINX_SERVER_PARAM})
     }
 
     const upstreamConfiguration = mustache.render(template.toString(), variables);
@@ -109,5 +109,8 @@ export function k6(simulationID: Number, tag?: K6Tag) {
     const env = Object.create(process.env);
     // Set the simulation id
     env.SIMULATION = simulationID;
-    return spawn(`k6`, ['run', '--out', 'influxdb', 'src/http_requests.js'], {env: env, stdio: ["ignore", "inherit", "inherit"]});
+    return spawn(`k6`, ['run', '--out', 'influxdb', 'src/http_requests.js'], {
+        env: env,
+        stdio: ["ignore", "inherit", "inherit"]
+    });
 }
