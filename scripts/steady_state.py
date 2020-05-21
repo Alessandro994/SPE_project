@@ -1,11 +1,9 @@
 import math
 import os
 
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from influxdb_client import Dialect, InfluxDBClient, Point
-from influxdb_client.client.write_api import SYNCHRONOUS
+from influxdb_client import InfluxDBClient
 from matplotlib import pyplot as plt
 from scipy.stats import t
 
@@ -40,6 +38,7 @@ values = query_result['_value']
 # Plot sample ACF
 ax = pd.plotting.autocorrelation_plot(values)
 ax.set_xlim([0, 1000])
+plt.title(f'Sample ACF for simulation {SIMULATION_ID}.')
 plt.show()
 
 durations = values.to_numpy()
@@ -49,13 +48,13 @@ batches_mean = [np.mean(b) for b in batches]
 grand_batches_mean = np.mean(batches_mean)
 
 batches_mean_est = sum(
-    [(b - grand_batches_mean)**2 for b in batches_mean]) / (NUM_BATCH - 1)
+    [(b - grand_batches_mean) ** 2 for b in batches_mean]) / (NUM_BATCH - 1)
 
 t_quantile = t.ppf(1 - CI_LEVEL, df=NUM_BATCH - 1)
 ci_min = grand_batches_mean - \
-    (t_quantile * math.sqrt(batches_mean_est / NUM_BATCH))
+         (t_quantile * math.sqrt(batches_mean_est / NUM_BATCH))
 ci_max = grand_batches_mean + \
-    (t_quantile * math.sqrt(batches_mean_est / NUM_BATCH))
+         (t_quantile * math.sqrt(batches_mean_est / NUM_BATCH))
 
 print(f'Mean of response time: {grand_batches_mean:.2f}.')
 print(f'CI for mean: [{ci_min:.2f}, {ci_max:.2f}].')
