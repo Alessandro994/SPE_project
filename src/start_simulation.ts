@@ -8,7 +8,7 @@ if (iterations == undefined) {
     iterations = "1"
 }
 // File containing the last simulation
-const SIMULATION_ID_FILE = "build/simulation.txt"
+const SIMULATION_ID_FILE = "build/simulation.txt";
 
 // Initialize the file the first time
 if (!fs.existsSync(SIMULATION_ID_FILE)) {
@@ -16,11 +16,11 @@ if (!fs.existsSync(SIMULATION_ID_FILE)) {
 }
 // Increment simulationID
 let simulationID = Number.parseInt(fs.readFileSync(SIMULATION_ID_FILE, {encoding: "utf8"}));
-simulationID += 1
+simulationID += 1;
 fs.writeFileSync(SIMULATION_ID_FILE, simulationID);
 
-console.info(`Simulation ID: ${simulationID}`)
-console.info(`Total iterations: ${iterations}`)
+console.info(`Simulation ID: ${simulationID}`);
+console.info(`Total iterations: ${iterations}`);
 
 async function runSimulation(iteration: Number) {
     console.info(`Starting iteration ${iteration}`);
@@ -30,31 +30,30 @@ async function runSimulation(iteration: Number) {
     processes = processes.concat(startServers());
 
     processes.forEach(process => {
-        process.on('close', (code, signal) => {
+        process.on('close', (code, _signal) => {
             if (code) {
-                console.log(`Process exited with code ${code}. Shutting down simulation`)
+                console.log(`Process exited with code ${code}. Shutting down simulation`);
                 stopSimulation(processes, true)
             }
         })
     });
 
-    const k6Process = k6(simulationID)
+    const k6Process = k6(simulationID);
     // Save reference to k6 process
     processes.push(k6Process);
 
-    return new Promise((resolve, reject) => {
-        k6Process.on('close', (code, signal) => {
+    return new Promise((resolve, _reject) => {
+        k6Process.on('close', (_code, _signal) => {
             console.info(`Finished iteration ${iteration}`);
             stopSimulation(processes);
             resolve();
         })
     });
 
-
 }
 
 function stopSimulation(processes: Array<ChildProcess>, failure = false) {
-    processes.forEach(process => process.kill())
+    processes.forEach(process => process.kill());
 
     if (failure) {
         process.exit(1)
@@ -69,4 +68,4 @@ async function main() {
     console.log("Finished simulation");
 }
 
-main()
+main();

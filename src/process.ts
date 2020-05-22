@@ -4,19 +4,14 @@ import mustache from 'mustache';
 import {MersenneTwister19937, Random} from 'random-js';
 
 
-export interface K6Tag {
-    name: string;
-    value: string;
-}
-
 const NUM_SERVERS = process.env.NUM_SERVERS as string;
 if (!NUM_SERVERS) {
     throw new Error("Please define env variable NUM_SERVERS")
 }
 
-let loadBalancing = process.env.LOAD_BALANCING
+let loadBalancing = process.env.LOAD_BALANCING;
 if (!loadBalancing) {
-    console.info("Defaulting to random load balancing policy")
+    console.info("Defaulting to random load balancing policy");
     loadBalancing = "random"
 } else {
     console.info(`Using ${loadBalancing} load balancing policy`)
@@ -41,18 +36,19 @@ export function startNginx() {
 }
 
 const startingPort = 5000;
+const lambdas = [0.005, 0.01, 1, 10];
 
 export function startServers() {
     const serverProcesses = new Array<ChildProcess>();
 
     // define PRNG
     let random;
-    const seed = process.env.SEED
+    const seed = process.env.SEED;
     if (seed === undefined) {
-        console.log("Using random seed")
+        console.log("Using random seed");
         random = new Random(MersenneTwister19937.autoSeed())
     } else {
-        console.log(`Using seed ${seed}`)
+        console.log(`Using seed ${seed}`);
         random = new Random(MersenneTwister19937.seed(parseInt(seed)))
     }
 
@@ -64,9 +60,10 @@ export function startServers() {
         // Set the server port and id via environment variable
         env.PORT = startingPort + index;
         env.SERVER_ID = index;
+        env.LAMBDA = lambdas[index];
 
-        const serverSeed = random.integer(0, 0x19999999999999); // [0 - 2^52]
-        env.SEED = serverSeed;
+         // [0 - 2^52]
+        env.SEED = random.integer(0, 0x19999999999999);
 
         const server = spawn('node', ["build/server.js"], {env: env});
         serverProcesses.push(server);
@@ -103,7 +100,7 @@ function writeNginxConf() {
     console.log("Written Nginx configuration");
 }
 
-export function k6(simulationID: Number, tag?: K6Tag) {
+export function k6(simulationID: Number) {
     console.info("Starting k6");
     // clone the actual env vars to avoid overrides
     const env = Object.create(process.env);

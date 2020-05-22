@@ -29,13 +29,13 @@ if (port === undefined) {
 
 const serverId = process.env.SERVER_ID;
 if (serverId === undefined) {
-    console.error('Server ID must be specified.')
+    console.error('Server ID must be specified.');
     process.exit(1);
 }
 
 const minResponseTime = process.env.MIN_RESPONSE_TIME as string;
 if (minResponseTime === undefined) {
-    console.error('MIN_RESPONSE_TIME must be specified.')
+    console.error('MIN_RESPONSE_TIME must be specified.');
     process.exit(1);
 }
 
@@ -52,7 +52,7 @@ app.get('/', function (req, res) {
 });
 
 app.listen(port, function () {
-    console.info(`Server ${serverId} listening on port ${port}`);
+    console.info(`Server ${serverId} listening on port ${port}. Lambda: ${lambda}`);
 });
 
 /**
@@ -68,7 +68,7 @@ function getResponseTime(lambda: number): number {
             const value = random.realZeroToOneInclusive();
             responseTime = (-Math.log(1 - value) / lambda) + parseInt(minResponseTime);
         } else {
-            console.error('Invalid value for EXP_RESPONSE_TIME.')
+            console.error('Invalid value for EXP_RESPONSE_TIME.');
             process.exit(1);
         }
     }
