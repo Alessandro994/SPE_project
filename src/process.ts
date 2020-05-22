@@ -11,8 +11,7 @@ if (!NUM_SERVERS) {
 
 let loadBalancing = process.env.LOAD_BALANCING;
 if (!loadBalancing) {
-    console.info("Defaulting to random load balancing policy");
-    loadBalancing = "random"
+    console.info("Defaulting to round-robin load balancing policy")
 } else {
     console.info(`Using ${loadBalancing} load balancing policy`)
 }
