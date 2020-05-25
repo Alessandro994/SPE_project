@@ -39,6 +39,8 @@ values = query_result['_value']
 ax = pd.plotting.autocorrelation_plot(values)
 ax.set_xlim([0, 1000])
 plt.title(f'Sample ACF for simulation {SIMULATION_ID}.')
+txt = "I need the caption to be present a little below X-axis"
+plt.figtext(0.5, 0.01, txt, wrap=True, horizontalalignment='center', fontsize=12)
 plt.show()
 
 durations = values.to_numpy()

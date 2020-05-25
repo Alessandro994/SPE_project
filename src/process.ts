@@ -36,7 +36,7 @@ export function startNginx() {
 }
 
 const startingPort = 5000;
-const lambdas = [0.005, 0.01, 1, 10];
+const lambdas = [0.01, 0.1, 1, 10];
 
 export function startServers() {
     const serverProcesses = new Array<ChildProcess>();
