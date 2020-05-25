@@ -25,6 +25,21 @@
             "program": "${workspaceFolder}/build/start_simulation.js",
             "preLaunchTask": "${defaultBuildTask}",
             "console": "integratedTerminal"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Process manager",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "env": {
+                "NUM_SERVERS": "3",
+                "MIN_RESPONSE_TIME": "100"
+            },
+            "program": "${workspaceFolder}/build/process_manager.js",
+            "preLaunchTask": "${defaultBuildTask}",
+            "console": "integratedTerminal"
         }
     ]
 }

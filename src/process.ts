@@ -2,42 +2,22 @@ import {ChildProcess, spawn} from 'child_process';
 import * as fs from 'fs';
 import mustache from 'mustache';
 import {MersenneTwister19937, Random} from 'random-js';
+import { SimulationData } from './SimulationData';
 
 
-const NUM_SERVERS = process.env.NUM_SERVERS as string;
-if (!NUM_SERVERS) {
-    throw new Error("Please define env variable NUM_SERVERS")
-}
-
-let loadBalancing = process.env.LOAD_BALANCING;
-if (!loadBalancing) {
-    console.info("Defaulting to round-robin load balancing policy")
-} else {
-    console.info(`Using ${loadBalancing} load balancing policy`)
-}
-
-export function startNginx() {
-    writeNginxConf();
+export function startNginx(simData: SimulationData) {
+    writeNginxConf(simData);
 
     console.info("Starting nginx on port 8080");
     // Inherit stdout and stdin from parent process
     const nginx = spawn('nginx', ["-c", "nginx/nginx.conf", "-p", process.cwd()], {stdio: 'inherit'});
 
-    // nginx.stdout.on('data', (data) => {
-    //     console.log(`${data}`);
-    // });
-
-    // nginx.stderr.on('data', (data) => {
-    //     console.log(`${data}`);
-    // });
-
     return nginx;
 }
 
-const startingPort = 5000;
 const lambdas = [0.005, 0.01, 1, 10];
 
-export function startServers() {
+export function startServers(sim: SimulationData) {
     const serverProcesses = new Array<ChildProcess>();
 
     // define PRNG
@@ -51,52 +31,63 @@ export function startServers() {
         random = new Random(MersenneTwister19937.seed(parseInt(seed)))
     }
 
-    for (let index = 0; index < Number.parseInt(NUM_SERVERS); index++) {
-
-        // clone the actual env vars to avoid overrides
-        const env = Object.create(process.env);
-
-        // Set the server port and id via environment variable
-        env.PORT = startingPort + index;
-        env.SERVER_ID = index;
-        env.LAMBDA = lambdas[index];
-
-         // [0 - 2^52]
-        env.SEED = random.integer(0, 0x19999999999999);
-
-        const server = spawn('node', ["build/server.js"], {env: env});
+    for (let index = 0; index < sim.numServers; index++) {
+        // If env variable is defined, used it. Otherwise use the lambdas array
+        const lambda = process.env.LAMBDA ? process.env.LAMBDA: lambdas[index]
+        const server = startServer({port: sim.startingPort + index, serverID: index, lambda:lambda, random: random})
         serverProcesses.push(server);
-
-        server.stdout.on('data', (data: any) => {
-            console.log(`${data}`);
-        });
-
-        server.stderr.on('data', (data: any) => {
-            console.log(`${data}`);
-        });
-
     }
+
     return serverProcesses;
 }
 
-function writeNginxConf() {
+export function startServer(settings: {port: number, serverID: number, lambda: number|string, random: Random}): ChildProcess {
+    // clone the actual env vars to avoid overrides
+    const env = Object.create(process.env);
+
+    // Set the server port and id via environment variable
+    env.PORT = settings.port;
+    env.SERVER_ID = settings.serverID;
+    env.LAMBDA = lambdas[settings.serverID];
+
+    // [0 - 2^52]
+    env.SEED = settings.random.integer(0, 0x19999999999999);
+
+    const server = spawn('node', ["build/server.js"], {env: env});
+
+    server.stdout.on('data', (data: any) => {
+        console.log(`${data}`);
+    });
+
+    server.stderr.on('data', (data: any) => {
+        console.log(`${data}`);
+    });
+    return server;
+}
+
+export function writeNginxConf(sim: SimulationData) {
     // Create the upstream.conf file based on the number of servers
     // Read the mustache template
     const template = fs.readFileSync("nginx/upstream.conf.mustache");
 
     const variables = {
         servers: Array(),
-        balancing_policy: loadBalancing
+        balancing_policy: sim.loadBalancing
     };
 
-    for (let index = 0; index < Number.parseInt(NUM_SERVERS); index++) {
-        const port = startingPort + index;
+    for (let index = 0; index < sim.numServers; index++) {
+        const port = sim.startingPort + index;
         variables.servers.push({port: port, param: process.env.NGINX_SERVER_PARAM})
     }
 
     const upstreamConfiguration = mustache.render(template.toString(), variables);
     fs.writeFileSync("nginx/upstream.conf", upstreamConfiguration);
     console.log("Written Nginx configuration");
+}
+
+export function reloadNginx(nginx: ChildProcess) {
+    console.info("Reloading Nginx configuration")
+    nginx.kill("SIGHUP")
 }
 
 export function k6(simulationID: Number) {

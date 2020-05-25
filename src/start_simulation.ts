@@ -1,6 +1,10 @@
 import {ChildProcess} from 'child_process';
 import {k6, startNginx, startServers} from './process';
+import { SimulationData } from "./SimulationData";
+import {promisify} from 'util'
 import * as fs from 'fs';
+import { SCALE_INTERVAL_MS, scaleServers } from './process_manager';
+const setTimeoutPromise = promisify(setTimeout);
 
 let iterations = process.env.ITERATIONS as string;
 // By default we do 1 iteration
@@ -23,41 +27,35 @@ console.info(`Simulation ID: ${simulationID}`);
 console.info(`Total iterations: ${iterations}`);
 
 async function runSimulation(iteration: Number) {
+    const simData = new SimulationData(simulationID)
     console.info(`Starting iteration ${iteration}`);
 
-    let processes = Array<ChildProcess>();
-    processes.push(startNginx());
-    processes = processes.concat(startServers());
+    simData.addProcess(startNginx(simData));
 
-    processes.forEach(process => {
-        process.on('close', (code, _signal) => {
-            if (code) {
-                console.log(`Process exited with code ${code}. Shutting down simulation`);
-                stopSimulation(processes, true)
-            }
-        })
-    });
+    const servers = startServers(simData);
 
+    servers.forEach(server => simData.addProcess(server))
+
+    // Start k6
     const k6Process = k6(simulationID);
     // Save reference to k6 process
-    processes.push(k6Process);
+    simData.addProcess(k6Process);
 
-    return new Promise((resolve, _reject) => {
+    // Autoscale number of servers
+    if (simData.autoScale) {
+        const autoScaleTimeout = setInterval(scaleServers, SCALE_INTERVAL_MS, simData)
+        simData.autoScaleTimeout = autoScaleTimeout
+    }
+
+    const k6Promise = new Promise((resolve, _reject) => {
         k6Process.on('close', (_code, _signal) => {
             console.info(`Finished iteration ${iteration}`);
-            stopSimulation(processes);
+            simData.stopSimulation();
             resolve();
         })
     });
 
-}
-
-function stopSimulation(processes: Array<ChildProcess>, failure = false) {
-    processes.forEach(process => process.kill());
-
-    if (failure) {
-        process.exit(1)
-    }
+    return k6Promise;
 }
 
 
