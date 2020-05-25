@@ -3,6 +3,8 @@ upstream app {
 {{#servers}}
     server localhost:{{port}} {{{param}}};
 {{/servers}}
+{{#balancing_policy}}
     # Load balancing policy
     {{balancing_policy}};
+{{/balancing_policy}}
 }
