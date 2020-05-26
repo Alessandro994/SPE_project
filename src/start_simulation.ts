@@ -3,7 +3,7 @@ import {k6, startNginx, startServers} from './process';
 import { SimulationData } from "./SimulationData";
 import {promisify} from 'util'
 import * as fs from 'fs';
-import { scaleServers, AutoScaleSettings } from './process_manager';
+import { scaleServers, AutoScaleSettings } from './autoscaler';
 const setTimeoutPromise = promisify(setTimeout);
 
 let iterations = process.env.ITERATIONS as string;

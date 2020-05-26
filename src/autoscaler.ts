@@ -1,12 +1,8 @@
 import { startServer, writeNginxConf, reloadNginx } from "./process";
 import { SimulationData } from "./SimulationData";
-import { InfluxDB, FluxTableMetaData, FluxResultObserver } from '@influxdata/influxdb-client'
-import { MersenneTwister19937, Random } from 'random-js';
+import { InfluxDB, FluxTableMetaData } from '@influxdata/influxdb-client'
 import { ChildProcess } from 'child_process';
-import { promisify } from 'util'
 
-const setIntervalPromise = promisify(setInterval);
-const setTimeoutPromise = promisify(setTimeout);
 
 export class AutoScaleSettings {
   /**
@@ -50,7 +46,6 @@ function getRequestsPerSecond(simData: SimulationData, autoscale: AutoScaleSetti
 
 /**
  * Check if it is necessary to change the number of servers given the number of requests received
- * //TODO: PNRG
  */
 export async function scaleServers(simulation: SimulationData, autoscale: AutoScaleSettings): Promise<ChildProcess | void> {
   const requests = await getRequestsPerSecond(simulation, autoscale)
