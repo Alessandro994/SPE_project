@@ -1,4 +1,5 @@
 import { ChildProcess } from 'child_process';
+import { Random, MersenneTwister19937 } from 'random-js';
 
 /**
  * Container for all the global information useful during a simulation
@@ -18,17 +19,30 @@ export class SimulationData {
      */
     readonly startingPort: number = 5000;
 
-    processes: Array<ChildProcess> = [];
     /**
-     * Timeout used to cancel the autoscaling function when shutting down
+     * Reference to the spawned processes
      */
-    autoScaleTimeout: NodeJS.Timeout|undefined
+    processes: Array<ChildProcess> = [];
+
+    /**
+     * Random number generator to obtain the seed for the express servers
+     */
+    random: Random;
 
     /**
      * Whether to enable or not the autoscaling of upstream servers
      */
-    readonly autoScale = process.env.AUTOSCALE ? true: false
+    readonly autoScale = process.env.AUTOSCALE ? true : false
 
+    /**
+     * Timeout used to cancel the autoscaling function when shutting down
+     */
+    autoScaleTimeout?: NodeJS.Timeout
+
+    /**
+     *
+     * @param id Simulation id
+     */
     constructor(readonly id: number) {
         const NUM_SERVERS = process.env.NUM_SERVERS as string;
         if (!NUM_SERVERS) {
@@ -36,11 +50,21 @@ export class SimulationData {
         }
         this.numServers = Number.parseInt(NUM_SERVERS);
 
+        const seed = process.env.SEED;
+        if (seed === undefined) {
+            console.log("Using random seed");
+            this.random = new Random(MersenneTwister19937.autoSeed())
+        } else {
+            console.log(`Using seed ${seed}`);
+            this.random = new Random(MersenneTwister19937.seed(parseInt(seed)))
+        }
+
         let loadBalancing = process.env.LOAD_BALANCING;
         if (!loadBalancing) {
             console.info("Defaulting to round-robin load balancing policy");
         }
         else {
+            //@ts-ignore
             this.loadBalancing = loadBalancing;
             console.info(`Using ${loadBalancing} load balancing policy`);
         }

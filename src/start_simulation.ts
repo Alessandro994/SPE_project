@@ -3,7 +3,7 @@ import {k6, startNginx, startServers} from './process';
 import { SimulationData } from "./SimulationData";
 import {promisify} from 'util'
 import * as fs from 'fs';
-import { SCALE_INTERVAL_MS, scaleServers } from './process_manager';
+import { scaleServers, AutoScaleSettings } from './process_manager';
 const setTimeoutPromise = promisify(setTimeout);
 
 let iterations = process.env.ITERATIONS as string;
@@ -28,6 +28,8 @@ console.info(`Total iterations: ${iterations}`);
 
 async function runSimulation(iteration: Number) {
     const simData = new SimulationData(simulationID)
+    const autoscaleSettings = new AutoScaleSettings()
+
     console.info(`Starting iteration ${iteration}`);
 
     simData.addProcess(startNginx(simData));
@@ -43,7 +45,8 @@ async function runSimulation(iteration: Number) {
 
     // Autoscale number of servers
     if (simData.autoScale) {
-        const autoScaleTimeout = setInterval(scaleServers, SCALE_INTERVAL_MS, simData)
+        console.info('Autoscaling enabled')
+        const autoScaleTimeout = setInterval(scaleServers, autoscaleSettings.scaleIntervalMs, simData, autoscaleSettings)
         simData.autoScaleTimeout = autoScaleTimeout
     }
 
