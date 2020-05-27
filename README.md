@@ -67,6 +67,7 @@ The first time you have to run `npm install` to install the project dependencies
 If you edit the `server.ts` file, then run `npm run tsc` to compile it. The result will be located in the `build` folder.
 
 ## Environment variables
+### Server
 * `PORT`*: the port the requests are sent to
 * `SERVER_ID`*: the server identifier
 * `SEED`: a value that can be provided to produce consistent results. If not defined, the pseudorandom number generator uses the current date under-the-hood.
@@ -74,12 +75,41 @@ If you edit the `server.ts` file, then run `npm run tsc` to compile it. The resu
 * `EXP_RESPONSE_TIME`: If defined, the server draws a random values from an exponential distribution.
 * `LAMBDA`: the lambda parameter of the exponential distribution. Default = 1.
 
-Variables with * are automatically provided by the Bash script that boostrap the servers.
+### Nginx
+* `LOAD_BALANCING`: Nginx load balancing policy __default: round-robin__
+
+### K6
+* `K6_ITERATIONS`: Number of iterations for each virtual user
+* `K6_VUS`: Number of concurrent requests
+
+
+Variables with * are automatically provided by the Bash script that bootstraps the servers.
 
 ## Start simulation
 To start a simulation run, run the following command.
 The environment variables need to be declared inline before the script.
 
 ```bash
-MIN_RESPONSE_TIME=100 NUM_SERVERS=1 SIMULATION=1 npm run simulation
+MIN_RESPONSE_TIME=100 NUM_SERVERS=1 npm run simulation
+
+NGINX_SERVER_PARAM=max_conns=5 LOAD_BALANCING=least_conn NUM_SERVERS=2 MIN_RESPONSE_TIME=100 EXP_RESPONSE_TIME=true K6_ITERATIONS=10000 K6_VUS=20 LAMBDA=0.01 SEED=10 K6_RPS=100 npm run simulation
+```
+
+
+## Cleanup DB
+Clear all series in influxdb
+```bash
+docker-compose exec influxdb influx -database k6 -execute 'DROP SERIES FROM /.*/'
+```
+
+## Limit CPU resources
+
+Use the following command
+
+```bash
+systemd-run --slice=user.slice --scope -p CPUQuota=100% nginx -c nginx/nginx.conf -p "$PWD"
+
+MIN_RESPONSE_TIME=100 SERVER_ID=0 PORT=5000 systemd-run --scope --slice=user.slice -p CPUQuota=100% node build/server.js
+
+SIMULATION=40 K6_ITERATIONS=^C0000 K6_VUS=100 systemd-run --scope --slice=user.slice -p CPUQuota=100% k6 run -o influxdb src/http_requests.js
 ```

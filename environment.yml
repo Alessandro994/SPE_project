@@ -1,10 +1,10 @@
 name: SPEproject
 channels:
   - defaults
-  - conda-forge
 dependencies:
-  - python=3.8
-  - ciso8601
   - pandas
   - matplotlib
+  - python=3.8
+  - ciso8601
+  - scipy
 

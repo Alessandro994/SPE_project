@@ -1,18 +1,19 @@
-import {ChildProcess, exec, spawn} from 'child_process';
+import {ChildProcess, spawn} from 'child_process';
 import * as fs from 'fs';
 import mustache from 'mustache';
 import {MersenneTwister19937, Random} from 'random-js';
-import {promisify} from 'util';
 
-
-export interface K6Tag {
-    name: string;
-    value: string;
-}
 
 const NUM_SERVERS = process.env.NUM_SERVERS as string;
 if (!NUM_SERVERS) {
     throw new Error("Please define env variable NUM_SERVERS")
+}
+
+let loadBalancing = process.env.LOAD_BALANCING;
+if (!loadBalancing) {
+    console.info("Defaulting to round-robin load balancing policy")
+} else {
+    console.info(`Using ${loadBalancing} load balancing policy`)
 }
 
 export function startNginx() {
@@ -33,18 +34,20 @@ export function startNginx() {
     return nginx;
 }
 
-const startingPort = 8081;
+const startingPort = 5000;
+const lambdas = [0.01, 0.1, 1, 10];
+
 export function startServers() {
     const serverProcesses = new Array<ChildProcess>();
 
     // define PRNG
     let random;
-    const seed = process.env.SEED
+    const seed = process.env.SEED;
     if (seed === undefined) {
-        console.log(`Using seed ${seed}`)
+        console.log("Using random seed");
         random = new Random(MersenneTwister19937.autoSeed())
     } else {
-        console.log("Using random seed")
+        console.log(`Using seed ${seed}`);
         random = new Random(MersenneTwister19937.seed(parseInt(seed)))
     }
 
@@ -56,9 +59,10 @@ export function startServers() {
         // Set the server port and id via environment variable
         env.PORT = startingPort + index;
         env.SERVER_ID = index;
+        env.LAMBDA = lambdas[index];
 
-        const serverSeed = random.integer(0, 0x19999999999999); // [0 - 2^52]
-        env.SEED = serverSeed;
+         // [0 - 2^52]
+        env.SEED = random.integer(0, 0x19999999999999);
 
         const server = spawn('node', ["build/server.js"], {env: env});
         serverProcesses.push(server);
@@ -81,12 +85,13 @@ function writeNginxConf() {
     const template = fs.readFileSync("nginx/upstream.conf.mustache");
 
     const variables = {
-        servers: Array()
+        servers: Array(),
+        balancing_policy: loadBalancing
     };
 
     for (let index = 0; index < Number.parseInt(NUM_SERVERS); index++) {
         const port = startingPort + index;
-        variables.servers.push({port: port})
+        variables.servers.push({port: port, param: process.env.NGINX_SERVER_PARAM})
     }
 
     const upstreamConfiguration = mustache.render(template.toString(), variables);
@@ -94,7 +99,14 @@ function writeNginxConf() {
     console.log("Written Nginx configuration");
 }
 
-export async function k6(tag?: K6Tag) {
+export function k6(simulationID: Number) {
     console.info("Starting k6");
-    return promisify(exec)(`k6 run --out influxdb src/http_requests.js`);
+    // clone the actual env vars to avoid overrides
+    const env = Object.create(process.env);
+    // Set the simulation id
+    env.SIMULATION = simulationID;
+    return spawn(`k6`, ['run', '--out', 'influxdb', 'src/http_requests.js'], {
+        env: env,
+        stdio: ["ignore", "inherit", "inherit"]
+    });
 }
