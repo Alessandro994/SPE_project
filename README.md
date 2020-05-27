@@ -81,5 +81,5 @@ To start a simulation run, run the following command.
 The environment variables need to be declared inline before the script.
 
 ```bash
-MIN_RESPONSE_TIME=100 NUM_SERVERS=1 npm run simulation
+MIN_RESPONSE_TIME=100 NUM_SERVERS=1 SIMULATION=1 npm run simulation
 ```
