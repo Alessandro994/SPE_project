@@ -4,6 +4,7 @@ import {MersenneTwister19937, Random} from "random-js";
 let lambda: number;
 let random: Random;
 let responseTime: number;
+let requestsCounter = 0;
 
 // Create a new express application instance
 const app: express.Application = express();
@@ -45,9 +46,12 @@ if (expResponseTime === undefined) {
 }
 
 app.get('/', function (req, res) {
+    requestsCounter++;
+
     setTimeout(() => {
         res.header('X-Server-Id', serverId);
         res.status(200).send();
+        requestsCounter--;
     }, getResponseTime(lambda));
 });
 
