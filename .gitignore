@@ -118,7 +118,9 @@ build
 
 ##################
 # Pycharm files
-.idea
+.idea/*
+!/.idea/runConfigurations
+
 
 ### Python ###
 # Byte-compiled / optimized / DLL files
