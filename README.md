@@ -74,6 +74,7 @@ If you edit the `server.ts` file, then run `npm run tsc` to compile it. The resu
 * `MIN_RESPONSE_TIME`: the time after which the server responds to a request.
 * `EXP_RESPONSE_TIME`: If defined, the server draws a random values from an exponential distribution.
 * `LAMBDA`: the lambda parameter of the exponential distribution. Default = 1.
+* `AUTOSCALE`: if true, autoscale the number of servers
 
 ### Nginx
 * `LOAD_BALANCING`: Nginx load balancing policy __default: round-robin__
