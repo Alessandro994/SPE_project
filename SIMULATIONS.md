@@ -18,3 +18,8 @@ In this configuration, instead, samples are not correlated.
 Adding more servers does not have any relevant effect on the results.
 
 
+## Configuration autoscaling
+
+```bash
+AUTOSCALE=true NUM_SERVERS=1 MIN_RESPONSE_TIME=100 EXP_RESPONSE_TIME=true K6_ITERATIONS=10000 K6_VUS=100 LAMBDA=0.1 SEED=10 K6_RPS=100 npm run simulation
+```

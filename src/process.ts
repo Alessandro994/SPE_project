@@ -10,7 +10,7 @@ export function startNginx(simData: SimulationData) {
 
     console.info("Starting nginx on port 8080");
     // Inherit stdout and stdin from parent process
-    const nginx = spawn('nginx', ["-c", "nginx/nginx.conf", "-p", process.cwd()], {stdio: 'inherit'});
+    const nginx = spawn('nginx', ["-c", "nginx/nginx.conf", "-p", process.cwd()], {stdio: ["ignore", "inherit", "ignore"]});
 
     return nginx;
 }

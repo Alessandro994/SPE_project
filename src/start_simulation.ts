@@ -21,7 +21,7 @@ if (!fs.existsSync(SIMULATION_ID_FILE)) {
 // Increment simulationID
 let simulationID = Number.parseInt(fs.readFileSync(SIMULATION_ID_FILE, {encoding: "utf8"}));
 simulationID += 1;
-fs.writeFileSync(SIMULATION_ID_FILE, simulationID);
+fs.writeFileSync(SIMULATION_ID_FILE, simulationID.toString());
 
 console.info(`Simulation ID: ${simulationID}`);
 console.info(`Total iterations: ${iterations}`);
@@ -48,6 +48,8 @@ async function runSimulation(iteration: Number) {
         console.info('Autoscaling enabled')
         const autoScaleTimeout = setInterval(scaleServers, autoscaleSettings.scaleIntervalMs, simData, autoscaleSettings)
         simData.autoScaleTimeout = autoScaleTimeout
+    } else {
+        console.info('Autoscaling disabled')
     }
 
     const k6Promise = new Promise((resolve, _reject) => {
