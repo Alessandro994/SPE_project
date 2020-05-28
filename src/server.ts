@@ -62,15 +62,16 @@ app.listen(port, function () {
 /**
  * Generate a response time.
  * If not specified, the response time is drawn from an exponential distribution.
+ * @param lambda parameter of the exponential distribution.
  */
 function getResponseTime(lambda: number): number {
 
     if (expResponseTime === undefined) {
-        responseTime = parseInt(minResponseTime);
+        responseTime = getMinResponseTime(minResponseTime);
     } else {
         if (expResponseTime === 'true') {
             const value = random.realZeroToOneInclusive();
-            responseTime = (-Math.log(1 - value) / lambda) + parseInt(minResponseTime);
+            responseTime = (-Math.log(1 - value) / lambda) + getMinResponseTime(minResponseTime);
         } else {
             console.error('Invalid value for EXP_RESPONSE_TIME.');
             process.exit(1);
@@ -78,4 +79,20 @@ function getResponseTime(lambda: number): number {
     }
 
     return responseTime;
+}
+
+/**
+ * If enabled by user, scale the minimum response time using a factor which depends on the current number of requests.
+ * Otherwise the default value is returned.
+ * @param minResponseTime specified by the user with an environment variable.
+ */
+function getMinResponseTime(minResponseTime: string): number {
+    const resTime = parseInt(minResponseTime);
+
+    if (process.env.SIMULATE_SERVER_LOAD === undefined) {
+        console.log('Server load is NOT simulated.');
+        return resTime;
+    }
+
+    return resTime * ((19 / 300) * requestsCounter + 1);
 }
