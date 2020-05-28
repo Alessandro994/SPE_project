@@ -12,7 +12,7 @@ export class AutoScaleSettings {
   /**
   * Interval in ms to check if we need to scale the servers
   */
-  readonly scaleIntervalMs = 2000;
+  readonly scaleIntervalMs = 500;
   /**
    * Time range in milliseconds to look for requests
    */

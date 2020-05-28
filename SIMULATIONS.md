@@ -23,3 +23,8 @@ Adding more servers does not have any relevant effect on the results.
 ```bash
 AUTOSCALE=true NUM_SERVERS=1 MIN_RESPONSE_TIME=100 EXP_RESPONSE_TIME=true K6_ITERATIONS=10000 K6_VUS=100 LAMBDA=0.1 SEED=10 K6_RPS=100 npm run simulation
 ```
+
+## Configuration 3
+```
+NUM_SERVERS=1 MIN_RESPONSE_TIME=100 EXP_RESPONSE_TIME=true SEED=10 LAMBDA=0.01 K6_RPS=300 SIMULATE_SERVER_LOAD=true K6_ITERATIONS=10000 K6_VUS=300 AUTOSCALE=true npm run simulation
+```

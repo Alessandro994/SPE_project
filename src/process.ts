@@ -2,7 +2,7 @@ import {ChildProcess, spawn} from 'child_process';
 import * as fs from 'fs';
 import mustache from 'mustache';
 import {MersenneTwister19937, Random} from 'random-js';
-import { SimulationData } from './SimulationData';
+import {SimulationData} from './SimulationData';
 
 
 export function startNginx(simData: SimulationData) {
@@ -25,8 +25,14 @@ export function startServers(simulation: SimulationData) {
 
     for (let index = 0; index < simulation.numServers; index++) {
         // If env variable is defined, used it. Otherwise use the lambdas array
-        const lambda = process.env.LAMBDA ? process.env.LAMBDA: lambdas[index]
-        const server = startServer({port: simulation.startingPort + index, serverID: index, lambda:lambda, random: simulation.random})
+        const lambda = (process.env.LAMBDA === undefined) ? lambdas[index] : process.env.LAMBDA;
+
+        const server = startServer({
+            port: simulation.startingPort + index,
+            serverID: index + 1,
+            lambda: lambda,
+            random: simulation.random
+        })
         serverProcesses.push(server);
     }
 
@@ -37,14 +43,14 @@ export function startServers(simulation: SimulationData) {
  * Start an express server, according to the settings passed as parameter
  * @returns A reference to the created process
  */
-export function startServer(settings: {port: number, serverID: number, lambda: number|string, random: Random}): ChildProcess {
+export function startServer(settings: { port: number, serverID: number, lambda: number | string, random: Random }): ChildProcess {
     // clone the actual env vars to avoid overrides
     const env = Object.create(process.env);
 
     // Set the server port and id via environment variable
     env.PORT = settings.port;
     env.SERVER_ID = settings.serverID;
-    env.LAMBDA = lambdas[settings.serverID];
+    env.LAMBDA = settings.lambda;
 
     // [0 - 2^52]
     env.SEED = settings.random.integer(0, 0x19999999999999);
