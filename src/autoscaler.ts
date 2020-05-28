@@ -6,6 +6,10 @@ import { ChildProcess } from 'child_process';
 
 export class AutoScaleSettings {
   /**
+   * Maximum number of servers to spawn
+   */
+  readonly maxServers = 20;
+  /**
   * Interval in ms to check if we need to scale the servers
   */
   readonly scaleIntervalMs = 2000;
@@ -47,12 +51,21 @@ function getRequestsPerSecond(simData: SimulationData, autoscale: AutoScaleSetti
 
 /**
  * Check if it is necessary to change the number of servers given the number of requests received
+ * @returns ChildProcess The handler to the newly created process
+ *
+ *          void If no server process was created
  */
 export async function scaleServers(simulation: SimulationData, autoscaleSettings: AutoScaleSettings): Promise<ChildProcess | void> {
+  if (simulation.numServers >= autoscaleSettings.maxServers) {
+    // Maximum number of servers reached, do nothing
+    return;
+  }
+
   const requests = await getRequestsPerSecond(simulation, autoscaleSettings)
 
   const requestsPerServer = requests / simulation.numServers
 
+  // Check if we need to scale
   if (requestsPerServer > autoscaleSettings.increaseThreshold) {
     console.debug(`Req per server: ${requestsPerServer}, creating a new server`)
 
