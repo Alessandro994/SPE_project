@@ -94,5 +94,5 @@ function getMinResponseTime(minResponseTime: string): number {
         return resTime;
     }
 
-    return resTime * ((19 / 300) * requestsCounter + 1);
+    return resTime * ((19 / 100) * requestsCounter + 1);
 }
