@@ -76,10 +76,10 @@ export async function scaleServers(simulation: SimulationData, autoscaleSettings
 
   // Check if we need to scale
   if (requestsPerServer > autoscaleSettings.increaseThreshold) {
-    console.debug(`Req per server: ${requestsPerServer}, creating a new server`)
-
     // Increase the number of servers
     simulation.numServers = simulation.numServers + 1
+
+    console.debug(`Req per server: ${requestsPerServer}, create server ${simulation.numServers}`)
 
     // Spawn a new server
     const port = simulation.startingPort + simulation.numServers
@@ -103,7 +103,7 @@ export async function scaleServers(simulation: SimulationData, autoscaleSettings
       return;
     }
 
-    console.log(`Req per server: ${requestsPerServer}, shutting down server`)
+    console.log(`Req per server: ${requestsPerServer}, shut down server ${simulation.numServers}`)
     const lastServer = simulation.processes.pop()
     lastServer?.kill()
     // Decrease the number of servers
