@@ -20,15 +20,15 @@ export class AutoScaleSettings {
   /**
    * Time range in milliseconds to look for requests
    */
-  readonly requestsRangeMs = 2000;
+  readonly requestsRangeMs = 5000;
   /**
    * Threshold after which a new server is created
    */
-  readonly increaseThreshold = 20;
+  readonly increaseThreshold = 10;
   /**
    * Threshold after which a server is shutdown
    */
-  readonly decreaseThreshold = 15;
+  readonly decreaseThreshold = 5;
 }
 
 const queryApi = new InfluxDB({ url: "http://localhost:8086", token: "" }).getQueryApi("")
@@ -72,8 +72,12 @@ export async function scaleServers(simulation: SimulationData, autoscaleSettings
 
   const requests = await getRequestsPerSecond(simulation, autoscaleSettings)
 
-  const requestsPerServer = requests / simulation.numServers
+  // Approximate number of requests per second
+  const requestsPerSeconds = requests / (autoscaleSettings.requestsRangeMs / 1000);
 
+  const requestsPerServer = requestsPerSeconds / simulation.numServers
+
+  // console.log(requestsPerServer)
   // Check if we need to scale
   if (requestsPerServer > autoscaleSettings.increaseThreshold) {
     // Increase the number of servers

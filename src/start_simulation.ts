@@ -1,7 +1,7 @@
-import {ChildProcess} from 'child_process';
-import {k6, startNginx, startServers} from './process';
+import { ChildProcess } from 'child_process';
+import { k6, startNginx, startServers } from './process';
 import { SimulationData } from "./SimulationData";
-import {promisify} from 'util'
+import { promisify } from 'util'
 import * as fs from 'fs';
 import { scaleServers, AutoScaleSettings } from './autoscaler';
 const setTimeoutPromise = promisify(setTimeout);
@@ -19,7 +19,7 @@ if (!fs.existsSync(SIMULATION_ID_FILE)) {
     fs.writeFileSync(SIMULATION_ID_FILE, "0");
 }
 // Increment simulationID
-let simulationID = Number.parseInt(fs.readFileSync(SIMULATION_ID_FILE, {encoding: "utf8"}));
+let simulationID = Number.parseInt(fs.readFileSync(SIMULATION_ID_FILE, { encoding: "utf8" }));
 simulationID += 1;
 fs.writeFileSync(SIMULATION_ID_FILE, simulationID.toString());
 
@@ -69,24 +69,25 @@ async function runSimulation(iteration: Number) {
  */
 async function scheduleAutoScaling(simData: SimulationData, autoscaleSettings: AutoScaleSettings) {
 
-        // Save as reference when we started the scaling operation
-        const startingTime = Date.now()
-        scaleServers(simData, autoscaleSettings).then(async () => {
-            // Calculate how much time has passed since we started scheduling
-            const elapsed = Date.now() - startingTime;
+    // Save as reference when we started the scaling operation
+    const startingTime = Date.now()
 
-            // Calculate the interval we need to wait before scheduling the next scaling operation
-            const sleepIntervalMs = autoscaleSettings.scaleIntervalMs - elapsed;
+    scaleServers(simData, autoscaleSettings).then(async () => {
+        // Calculate how much time has passed since we started scheduling
+        const elapsed = Date.now() - startingTime;
 
-            // If we have a positive sleep interval, sleep for the remaining time
-            if (sleepIntervalMs > 0) {
-                await new Promise(resolve =>
-                    simData.autoScaleTimeout = setTimeout(resolve, sleepIntervalMs)
-                );
-            }
-            // Reschedule periodically the scale operation
-            scheduleAutoScaling(simData, autoscaleSettings);
-        })
+        // Calculate the interval we need to wait before scheduling the next scaling operation
+        const sleepIntervalMs = autoscaleSettings.scaleIntervalMs - elapsed;
+
+        // If we have a positive sleep interval, sleep for the remaining time
+        if (sleepIntervalMs > 0) {
+            await new Promise(resolve =>
+                simData.autoScaleTimeout = setTimeout(resolve, sleepIntervalMs)
+            );
+        }
+        // Reschedule periodically the scale operation
+        scheduleAutoScaling(simData, autoscaleSettings);
+    })
 
 }
 
