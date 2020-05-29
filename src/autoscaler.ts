@@ -9,10 +9,14 @@ export class AutoScaleSettings {
    * Maximum number of servers to spawn
    */
   readonly maxServers = 20;
+    /**
+   * Minimum number of servers to spawn
+   */
+  readonly minServers = 1;
   /**
   * Interval in ms to check if we need to scale the servers
   */
-  readonly scaleIntervalMs = 500;
+  readonly scaleIntervalMs = 1000;
   /**
    * Time range in milliseconds to look for requests
    */
@@ -20,7 +24,11 @@ export class AutoScaleSettings {
   /**
    * Threshold after which a new server is created
    */
-  readonly increaseThreshold = 10;
+  readonly increaseThreshold = 20;
+  /**
+   * Threshold after which a server is shutdown
+   */
+  readonly decreaseThreshold = 15;
 }
 
 const queryApi = new InfluxDB({ url: "http://localhost:8086", token: "" }).getQueryApi("")
@@ -88,6 +96,22 @@ export async function scaleServers(simulation: SimulationData, autoscaleSettings
     reloadNginx(simulation.processes[0])
 
     return server;
+  } else if (requestsPerServer < autoscaleSettings.decreaseThreshold) {
+
+    if (simulation.numServers == autoscaleSettings.minServers) {
+      return;
+    }
+
+    console.log(`Req per server: ${requestsPerServer}, shutting down server`)
+    const lastServer = simulation.processes.pop()
+    lastServer?.kill()
+    // Decrease the number of servers
+    simulation.numServers = simulation.numServers - 1
+    // Reload Nginx
+    writeNginxConf(simulation);
+    reloadNginx(simulation.processes[0])
+    return
+
   }
 }
 

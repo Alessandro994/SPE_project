@@ -84,11 +84,11 @@ export function writeNginxConf(simulation: SimulationData) {
 
     const upstreamConfiguration = mustache.render(template.toString(), variables);
     fs.writeFileSync("nginx/upstream.conf", upstreamConfiguration);
-    console.log("Written Nginx configuration");
+    // console.log("Written Nginx configuration");
 }
 
 export function reloadNginx(nginx: ChildProcess) {
-    console.info("Reloading Nginx configuration")
+    // console.info("Reloading Nginx configuration")
     nginx.kill("SIGHUP")
 }
 
