@@ -64,6 +64,7 @@ function getRequestsPerSecond(simData: SimulationData, autoscale: AutoScaleSetti
  *          void If no server process was created
  */
 export async function scaleServers(simulation: SimulationData, autoscaleSettings: AutoScaleSettings): Promise<ChildProcess | void> {
+
   if (simulation.numServers >= autoscaleSettings.maxServers) {
     // Maximum number of servers reached, do nothing
     return;
@@ -110,7 +111,7 @@ export async function scaleServers(simulation: SimulationData, autoscaleSettings
     // Reload Nginx
     writeNginxConf(simulation);
     reloadNginx(simulation.processes[0])
-    return
+    return;
 
   }
 }
