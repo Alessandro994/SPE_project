@@ -90,7 +90,7 @@ function getMinResponseTime(minResponseTime: string): number {
     const resTime = parseInt(minResponseTime);
 
     if (process.env.SIMULATE_SERVER_LOAD === undefined) {
-        console.log('Server load is NOT simulated.');
+        // console.log('Server load is NOT simulated.');
         return resTime;
     }
 
