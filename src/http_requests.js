@@ -1,6 +1,6 @@
+import { check } from 'k6';
 import http from 'k6/http';
-import {check} from 'k6';
-import {Gauge} from 'k6/metrics';
+import { Gauge } from 'k6/metrics';
 
 // Custom metric to save the server id as tag
 var response_time_gauge = new Gauge('response_time');
@@ -29,7 +29,7 @@ export default function () {
 
     check(
         res,
-        {"is status 200": r => r.status === 200},
+        { "is status 200": r => r.status === 200 },
         {
             server_id: res.headers["X-Server-Id"]
         }
@@ -39,6 +39,7 @@ export default function () {
         res.timings.duration,
         {
             server_id: res.headers["X-Server-Id"],
+            processingTime: res.headers["X-Sim-Processing-Time"],
             iteration: __ITER
         }
     )
