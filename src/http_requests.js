@@ -39,7 +39,7 @@ export default function () {
         res.timings.duration,
         {
             server_id: res.headers["X-Server-Id"],
-            processingTime: res.headers["X-Sim-Processing-Time"],
+            processing_time: res.headers["X-Sim-Processing-Time"],
             iteration: __ITER
         }
     )
