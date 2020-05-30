@@ -81,11 +81,11 @@ app.listen(port, function () {
 export function getResponseTime(lambda: string): number {
 
     if (expResponseTime === undefined) {
-        responseTime = getMinResponseTime(minResponseTime);
+        responseTime = getMinResponseTime(minResponseTime!);
     } else {
         if (expResponseTime === 'true') {
             const value = random.realZeroToOneInclusive();
-            responseTime = (-Math.log(1 - value) / lambda) + getMinResponseTime(minResponseTime);
+            responseTime = (-Math.log(1 - value) / parseFloat(lambda)) + getMinResponseTime(minResponseTime!);
         } else {
             console.error('Invalid value for EXP_RESPONSE_TIME.');
             process.exit(1);
