@@ -24,6 +24,18 @@ from(bucket:"k6")
 ```
 
 
+### Response time, without processing_time
+Query that shows how much time was spent outside http server for each request, sorted by send time
+```
+import "experimental"
+from(bucket:"k6")
+  |> range(start: -1y)
+  |> filter(fn: (r) => r._measurement == "response_time" and r.simulation == "4" and r._field == "value")
+  |> map(fn:(r) => ({_value:  r._value - float(v: r.processing_time), _time: experimental.subDuration(d: duration(v: int(v: r._value*1000000.0)), from: r._time)}))
+  |> sort(columns: ["_time"])
+
+```
+
 #### Response time per server (broken)
 ```
 import "experimental"
