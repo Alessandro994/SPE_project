@@ -10,6 +10,7 @@ services:
       - INFLUXDB_HTTP_FLUX_ENABLED=true
     volumes:
       - influxdb:/var/lib/influxdb
+      - ./influx_backup:/influx_backup
 
   grafana:
     image: grafana/grafana:latest

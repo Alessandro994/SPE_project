@@ -10,7 +10,17 @@ export let options = {
     tags: {
         simulation: __ENV.SIMULATION,
         load_balacing: __ENV.LOAD_BALANCING
-    }
+    },
+    // stages: [
+    //     // Ramp-up from 1 to 20 VUs in 30s
+    //     {duration: "30s", target: 60},
+    //
+    //     // Stay at rest on 20 VUs for 15s
+    //     {duration: "15s"},
+    //
+    //     // Ramp-down from 20 to 1 VUs for 30s
+    //     {duration: "30s", target: 1}
+    // ]
 };
 
 // VU code which is run over and over for as long as the test is running.
