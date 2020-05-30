@@ -2,8 +2,20 @@
 The file for taking down some observations wrt simulations.
 
 ## Configuration 1
+
+- **Round robin** policy (default)
 ```
 NUM_SERVERS=10 MIN_RESPONSE_TIME=100 K6_ITERATIONS=100000 K6_VUS=100 LAMBDA=0.01 K6_RPS=100 npm run simulation
+```
+
+- **Random** policy
+```
+NUM_SERVERS=10 MIN_RESPONSE_TIME=100 K6_ITERATIONS=100000 K6_VUS=100 LAMBDA=0.01 K6_RPS=100 LOAD_BALANCING=random npm run simulation
+```
+
+- **Least connected** policy
+```
+NUM_SERVERS=10 MIN_RESPONSE_TIME=100 K6_ITERATIONS=100000 K6_VUS=100 LAMBDA=0.01 K6_RPS=100 LOAD_BALANCING=least_conn npm run simulation
 ```
 
 This configuration causes correlation among the samples. The reason lays in the number of requests per second which is
