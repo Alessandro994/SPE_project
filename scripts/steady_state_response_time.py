@@ -15,7 +15,7 @@ CI_LEVEL = 0.05
 SIMULATION_ID_FILE = "build/simulation.txt"
 
 
-def compute_mrt_for_simulation(simulation_id: str) -> MeanResponseTime:
+def compute_mrt_for_simulation(simulation_id: int, autocorrelation_plot=True) -> MeanResponseTime:
     client = InfluxDBClient(url="http://localhost:8086",
                             token="my-token", org="BBM SpA")
 
@@ -31,8 +31,9 @@ def compute_mrt_for_simulation(simulation_id: str) -> MeanResponseTime:
 
     values = requests_duration['_value']
 
-    # Plot sample ACF
-    plot_sample_autocorrelation(values, simulation_id)
+    if autocorrelation_plot:
+        # Plot sample ACF
+        plot_sample_autocorrelation(values, simulation_id)
 
     durations = values.to_numpy()
     print(f'Initial number of samples: {len(durations)}.')
@@ -54,17 +55,17 @@ def compute_mrt_for_simulation(simulation_id: str) -> MeanResponseTime:
         [(b - grand_batches_mean) ** 2 for b in batches_mean]) / (NUM_BATCH - 1)
 
     t_quantile = t.ppf(1 - CI_LEVEL, df=NUM_BATCH - 1)
-    ci_min = grand_batches_mean - \
-             (t_quantile * math.sqrt(batches_mean_est / NUM_BATCH))
-    ci_max = grand_batches_mean + \
-             (t_quantile * math.sqrt(batches_mean_est / NUM_BATCH))
+    ci_interval = (t_quantile * math.sqrt(batches_mean_est / NUM_BATCH))
 
-    mrt = MeanResponseTime(grand_batches_mean, ci_min, ci_max)
+    ci_min = grand_batches_mean - ci_interval
+    ci_max = grand_batches_mean + ci_interval
+
+    mrt = MeanResponseTime(grand_batches_mean, ci_min, ci_max, ci_interval)
     print(mrt)
     return mrt
 
 
-def plot_sample_autocorrelation(values: pd.DataFrame, simulation_id: str):
+def plot_sample_autocorrelation(values: pd.DataFrame, simulation_id: int):
     # Plot sample ACF
     ax = pd.plotting.autocorrelation_plot(values)
     ax.set_xlim([0, 1000])
@@ -74,7 +75,7 @@ def plot_sample_autocorrelation(values: pd.DataFrame, simulation_id: str):
     plt.show()
 
 
-def get_simulation_id() -> str:
+def get_simulation_id() -> int:
     if not os.environ.get("SIMULATION"):
         # Read the ID of the simulation from the file
         simulation_file = open(SIMULATION_ID_FILE, "r")
@@ -82,7 +83,7 @@ def get_simulation_id() -> str:
     else:
         simulation_id = os.environ.get("SIMULATION")
 
-    return simulation_id
+    return int(simulation_id)
 
 
 if __name__ == "__main__":
