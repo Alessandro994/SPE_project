@@ -4,6 +4,7 @@ import { Gauge } from 'k6/metrics';
 
 // Custom metric to save the server id as tag
 var response_time_gauge = new Gauge('response_time');
+var processing_time_gauge = new Gauge('processing_time');
 
 export let options = {
     systemTags: ["iter", "proto", "subproto", "status", "method", "url", "name", "group", "check", "error", "error_code", "tls_version"],
@@ -39,8 +40,14 @@ export default function () {
         res.timings.duration,
         {
             server_id: res.headers["X-Server-Id"],
-            processing_time: res.headers["X-Sim-Processing-Time"],
             iteration: __ITER
+        }
+    )
+
+    processing_time_gauge.add(
+        parseFloat(res.headers["X-Sim-Processing-Time"]),
+        {
+            server_id: res.headers["X-Server-Id"]
         }
     )
 
