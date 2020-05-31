@@ -44,7 +44,8 @@ def compute_mrt_for_simulation(simulation_id: int, autocorrelation_plot=True) ->
     # remove a number of initial samples corresponding to the modulo.
     if modulo != 0:
         durations = durations[modulo:]
-        print(f'Removing {modulo} samples to get an equal number of samples in each batch.')
+        print(
+            f'Removing {modulo} samples to get an equal number of samples in each batch.')
 
     batches = np.split(durations, NUM_BATCH)
 
@@ -68,10 +69,8 @@ def compute_mrt_for_simulation(simulation_id: int, autocorrelation_plot=True) ->
 def plot_sample_autocorrelation(values: pd.DataFrame, simulation_id: int):
     # Plot sample ACF
     ax = pd.plotting.autocorrelation_plot(values)
-    ax.set_xlim([0, 1000])
+    ax.set_xlim([0, 100000])
     plt.title(f'Sample ACF for simulation {simulation_id}')
-    txt = "I need the caption to be present a little below X-axis"
-    plt.figtext(0.5, 0.01, txt, wrap=True, horizontalalignment='center', fontsize=12)
     plt.show()
 
 
