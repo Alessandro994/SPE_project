@@ -1,7 +1,7 @@
-import { startServer, writeNginxConf, reloadNginx } from "./process";
-import { SimulationData } from "./SimulationData";
-import { InfluxDB, FluxTableMetaData } from '@influxdata/influxdb-client'
-import { ChildProcess } from 'child_process';
+import {FluxTableMetaData, InfluxDB} from '@influxdata/influxdb-client';
+import {ChildProcess} from 'child_process';
+import {reloadNginx, startServer, writeNginxConf} from "./process";
+import {SimulationData} from "./SimulationData";
 
 
 export class AutoScaleSettings {
@@ -9,9 +9,9 @@ export class AutoScaleSettings {
    * Maximum number of servers to spawn
    */
   readonly maxServers = 20;
-    /**
-   * Minimum number of servers to spawn
-   */
+  /**
+ * Minimum number of servers to spawn
+ */
   readonly minServers = 1;
   /**
   * Interval in ms to check if we need to scale the servers
@@ -20,7 +20,7 @@ export class AutoScaleSettings {
   /**
    * Time range in milliseconds to look for requests
    */
-  readonly requestsRangeMs = 5000;
+  readonly requestsRangeMs = 20000;
   /**
    * Threshold after which a new server is created
    */
@@ -31,7 +31,7 @@ export class AutoScaleSettings {
   readonly decreaseThreshold = 5;
 }
 
-const queryApi = new InfluxDB({ url: "http://localhost:8086", token: "" }).getQueryApi("")
+const queryApi = new InfluxDB({url: "http://localhost:8086", token: ""}).getQueryApi("")
 
 function getRequestsPerSecond(simData: SimulationData, autoscale: AutoScaleSettings): Promise<number> {
 
@@ -52,7 +52,7 @@ function getRequestsPerSecond(simData: SimulationData, autoscale: AutoScaleSetti
       error(error: Error) {
         reject(error)
       },
-      complete() { resolve(0) }
+      complete() {resolve(0)}
     })
   })
 }
