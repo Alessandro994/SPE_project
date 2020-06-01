@@ -11,6 +11,10 @@ services:
     volumes:
       - influxdb:/var/lib/influxdb
       - ./influx_backup:/influx_backup
+    deploy:
+      resources:
+        limits:
+          memory: 4gb
 
   grafana:
     image: grafana/grafana:latest
