@@ -45,7 +45,7 @@ def compute_mrt_for_simulation(simulation_id: int, autocorrelation_plot=True) ->
     if modulo != 0:
         durations = durations[modulo:]
         print(
-            f'Removing {modulo} samples to get an equal number of samples in each batch.')
+            f'Removing {modulo} samples to get an equal number of samples in each batch ({len(durations) / NUM_BATCH}).')
 
     batches = np.split(durations, NUM_BATCH)
 

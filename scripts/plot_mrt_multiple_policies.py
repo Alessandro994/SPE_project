@@ -15,7 +15,7 @@ if __name__ == "__main__":
     ci_intervals = []
 
     for i in range(0, 3):
-        sim_id = sim -i
+        sim_id = sim - i
         print(f'Analyzing simulation {sim_id}')
 
         response_time = compute_mrt_for_simulation(
