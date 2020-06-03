@@ -17,48 +17,42 @@ query = ('import "experimental"'
          '|> filter(fn: (r) => r._measurement == "response_time" and r._field == "value" and r.simulation == "89")'
          '|> group(columns: ["measurement"])'
          '|> aggregateWindow(every: 500ms, fn: distinct, column: "server_id", createEmpty: false)'
+         '|> aggregateWindow(every: 500ms, fn: count, createEmpty: false)'
          '|> map(fn: (r) => ({ r with _value: int(v: r._value) }))')
 
 
 if __name__ == "__main__":
 
     sim = get_simulation_id()
-    query_results = query_api.query_data_frame(query)
 
-    num_servers = pd.DataFrame(query_results[['_value', '_time']])
-
-    num_servers.rename(columns={'_value': 'value'}, inplace=True)
-    num_servers.set_index('_time', inplace=True)
-
-    num_servers.plot()
-    plt.show()
     policies = ['round-robin', 'random', 'least-connected']
-    averages_response_time = []
-    ci_intervals = []
+    results = pd.DataFrame()
 
-    # for i in range(0, 3):
-        # sim_id = sim - i
-        # print(f'Analyzing simulation {sim_id}')
-        #
-        # response_time = compute_mrt_for_simulation(
-        #     sim_id, autocorrelation_plot=False)
-        # averages_response_time.append(response_time.mean)
-        # ci_intervals.append(response_time.ci_interval)
+    for i in range(0, 3):
+        sim_id = sim - i
+        print(f'Analyzing simulation {sim_id}')
 
-    # plt.errorbar(
-    #     x=policies,
-    #     y=averages_response_time,
-    #     yerr=ci_intervals,
-    #     # Disable line between x data points
-    #     ls='None',
-    #     fmt='_',
-    #     lolims=True,
-    #     uplims=True,
-    # )
-    # plt.title('Average response time per policy')
-    # plt.xlabel('Load balancing policy')
-    # plt.ylabel('Average response time (ms)')
-    # plt.grid(True)
-    #
-    # plt.ylim(bottom=MIN_Y, top=max(averages_response_time) * 1.005)
-    # plt.show()
+        query = ('import "experimental"'
+                 'from(bucket:"k6")'
+                 '|> range(start: -1y)'
+                 f'|> filter(fn: (r) => r._measurement == "response_time" and r._field == "value" and r.simulation == "{sim_id}")'
+                 '|> group(columns: ["measurement"])'
+                 '|> aggregateWindow(every: 500ms, fn: distinct, column: "server_id", createEmpty: false)'
+                 '|> aggregateWindow(every: 500ms, fn: count, createEmpty: false)'
+                 '|> map(fn: (r) => ({ r with _value: int(v: r._value) }))')
+
+        query_results = query_api.query_data_frame(query)
+
+        num_servers = pd.DataFrame(query_results[['_value', '_time']])
+        starting_time = min(num_servers['_time'])
+        num_servers = num_servers.apply(lambda x: [x['_value'],  x['_time']-starting_time], axis=1, result_type='expand')
+        num_servers.rename(columns={0: policies[i], 1: "time"}, inplace=True)
+        num_servers.set_index('time', inplace=True)
+
+        results = results.join(num_servers, how="outer")
+
+    results.plot()
+    plt.title("Number of servers over time")
+    plt.grid(True)
+    plt.show()
+
