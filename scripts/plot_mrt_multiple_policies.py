@@ -38,5 +38,5 @@ if __name__ == "__main__":
     plt.ylabel('Average response time (ms)')
     plt.grid(True)
 
-    plt.ylim(bottom=MIN_Y, top=max(averages_response_time) * 1.005)
+    plt.ylim(bottom=MIN_Y, top=(max(averages_response_time) + max(ci_intervals)) * 1.005)
     plt.show()
