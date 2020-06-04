@@ -1,5 +1,4 @@
 import math
-import os
 
 import numpy as np
 import pandas as pd
@@ -7,18 +6,14 @@ from influxdb_client import InfluxDBClient
 from matplotlib import pyplot as plt
 from scipy.stats import t
 
-from DataObjects.MeanResponseTime import MeanResponseTime
+from scripts.DataObjects.MeanResponseTime import MeanResponseTime
+from scripts.get_simulation_id import get_simulation_id
 
 NUM_BATCH = 64
 CI_LEVEL = 0.05
 
-SIMULATION_ID_FILE = "build/simulation.txt"
-
-
-def compute_mrt_for_simulation(simulation_id: int, autocorrelation_plot=True) -> MeanResponseTime:
-    client = InfluxDBClient(url="http://localhost:8086",
-                            token="my-token", org="BBM SpA")
-
+def compute_mrt_for_simulation_ss(simulation_id: int, autocorrelation_plot=True) -> MeanResponseTime:
+    client = InfluxDBClient(url="http://localhost:8086", token="my-token", org="BBM SpA")
     query_api = client.query_api()
 
     requests_duration = query_api.query_data_frame('import "experimental"'
@@ -28,7 +23,6 @@ def compute_mrt_for_simulation(simulation_id: int, autocorrelation_plot=True) ->
                                                    '|> map(fn:(r) => ({r with _time: experimental.subDuration(d: duration(v: int(v: r._value*1000000.0)), from: r._time)}))'
                                                    '|> sort(columns: ["_time"], desc: false)'
                                                    )
-
     values = requests_duration['_value']
 
     if autocorrelation_plot:
@@ -74,19 +68,8 @@ def plot_sample_autocorrelation(values: pd.DataFrame, simulation_id: int):
     plt.show()
 
 
-def get_simulation_id() -> int:
-    if not os.environ.get("SIMULATION"):
-        # Read the ID of the simulation from the file
-        simulation_file = open(SIMULATION_ID_FILE, "r")
-        simulation_id = simulation_file.read()
-    else:
-        simulation_id = os.environ.get("SIMULATION")
-
-    return int(simulation_id)
-
-
 if __name__ == "__main__":
     sim = get_simulation_id()
     print(f'Analyzing simulation {sim}')
 
-    compute_mrt_for_simulation(sim)
+    compute_mrt_for_simulation_ss(sim)

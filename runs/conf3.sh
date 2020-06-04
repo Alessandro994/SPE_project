@@ -11,6 +11,10 @@ export LAMBDA=0.01
 export K6_RPS=100
 export AUTOSCALE=true
 
+echo "Starting round-robin"
+npm run simulation
+sleep 5
+
 export LOAD_BALANCING=least_conn
 echo "Starting $LOAD_BALANCING"
 npm run simulation
@@ -18,10 +22,5 @@ sleep 5
 
 export LOAD_BALANCING=random
 echo "Starting $LOAD_BALANCING"
-npm run simulation
-sleep 5
-
-unset LOAD_BALANCING
-echo "Starting round-robin"
 npm run simulation
 sleep 5
