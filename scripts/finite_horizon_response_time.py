@@ -4,8 +4,8 @@ import numpy as np
 from influxdb_client import InfluxDBClient
 from scipy.stats import t
 
-from scripts.DataObjects.MeanResponseTime import MeanResponseTime
-from scripts.get_simulation_id import get_simulation_id
+from DataObjects.MeanResponseTime import MeanResponseTime
+from get_simulation_id import get_simulation_id
 
 CI_LEVEL = 0.05
 REPLICATIONS_NUM = 5

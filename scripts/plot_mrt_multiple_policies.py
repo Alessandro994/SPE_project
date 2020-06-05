@@ -2,9 +2,9 @@
 
 import matplotlib.pyplot as plt
 
-from scripts.get_simulation_id import get_simulation_id
-from scripts.steady_state_response_time import compute_mrt_for_simulation_ss
-from scripts.finite_horizon_response_time import compute_mrt_for_simulation_fh
+from get_simulation_id import get_simulation_id
+from steady_state_response_time import compute_mrt_for_simulation_ss
+from finite_horizon_response_time import compute_mrt_for_simulation_fh
 
 MIN_Y = 500
 

@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-# Execute 5 replications with round-robin policy (same seed per replication).
+echo "Execute 5 replications with round-robin policy (same seed per replication)."
 
 export SEED=1000000000
 
@@ -28,5 +28,5 @@ while [ $counter -lt $replications ]; do
   echo "Replication no. $counter"
   npm run simulation
   sleep 5
-  ((counter++))
+  counter=$((counter+1))
 done

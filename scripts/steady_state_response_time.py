@@ -6,8 +6,8 @@ from influxdb_client import InfluxDBClient
 from matplotlib import pyplot as plt
 from scipy.stats import t
 
-from scripts.DataObjects.MeanResponseTime import MeanResponseTime
-from scripts.get_simulation_id import get_simulation_id
+from DataObjects.MeanResponseTime import MeanResponseTime
+from get_simulation_id import get_simulation_id
 
 NUM_BATCH = 64
 CI_LEVEL = 0.05

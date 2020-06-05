@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-# Execute 5 replications with least-connected policy (different seed per replication).
+echo "Execute 5 replications with least-connected policy (different seed per replication)."
 
 export NUM_SERVERS=1
 export MIN_RESPONSE_TIME=500
@@ -29,5 +29,5 @@ while [ $counter -lt $replications ]; do
   export SEED=$((1000000000 + counter))
   npm run simulation
   sleep 5
-  ((counter++))
+  counter=$((counter+1))
 done
