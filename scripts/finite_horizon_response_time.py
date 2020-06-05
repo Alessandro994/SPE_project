@@ -56,5 +56,5 @@ def compute_mrt_for_simulation_fh(simulation_id: int) -> MeanResponseTime:
 if __name__ == "__main__":
     sim = get_simulation_id()
 
-    print(f'Analyzing simulation {sim}')
+    print(f'Starting from simulation {sim}')
     compute_mrt_for_simulation_fh(sim)

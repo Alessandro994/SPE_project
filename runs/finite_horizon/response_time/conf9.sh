@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-echo "Execute 5 replications with random policy (different seed per replication)."
+echo "Execute 5 replications with least-connected policy"
 
 export NUM_SERVERS=1
 export MIN_RESPONSE_TIME=500
@@ -12,12 +12,12 @@ export LAMBDA=0.01
 export K6_RPS=100
 export SIMULATE_SERVER_LOAD=true
 
-export LOAD_BALANCING=random
+export LOAD_BALANCING=least_conn
 
 export AUTOSCALE=true
-export AUTOSCALE_INCREASE_THRESHOLD=10
-export AUTOSCALE_DECREASE_THRESHOLD=5
-export AUTOSCALE_POLICY=REQUESTS_PER_SECOND
+export AUTOSCALE_POLICY=RESPONSE_TIME
+export AUTOSCALE_INCREASE_THRESHOLD=1000
+export AUTOSCALE_DECREASE_THRESHOLD=900
 export AUTOSCALE_LOOKUP_INTERVAL=20000
 export AUTOSCALE_ALGORITHM_INTERVAL=1000
 
