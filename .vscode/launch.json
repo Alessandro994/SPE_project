@@ -37,7 +37,22 @@
                 "NUM_SERVERS": "3",
                 "MIN_RESPONSE_TIME": "100"
             },
-            "program": "${workspaceFolder}/build/process_manager.js",
+            "program": "${workspaceFolder}/build/process.js",
+            "preLaunchTask": "${defaultBuildTask}",
+            "console": "integratedTerminal"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Autoscaler",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "env": {
+                "NUM_SERVERS": "3",
+                "MIN_RESPONSE_TIME": "100"
+            },
+            "program": "${workspaceFolder}/build/autoscaler.js",
             "preLaunchTask": "${defaultBuildTask}",
             "console": "integratedTerminal"
         }

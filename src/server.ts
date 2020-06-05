@@ -49,7 +49,7 @@ if (minResponseTime === undefined) {
 // Use exponential response time
 const expResponseTime = process.env.EXP_RESPONSE_TIME;
 if (expResponseTime === undefined) {
-    console.info("Using static response time");
+    // console.info("Using static response time");
 }
 
 // ------------------------------------------------------------------

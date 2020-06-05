@@ -3,7 +3,13 @@ import { k6, startNginx, startServers } from './process';
 import { SimulationData } from "./SimulationData";
 import { promisify } from 'util'
 import * as fs from 'fs';
-import { scaleServers, AutoScaleSettings } from './autoscaler';
+import {
+    scaleServers,
+    AutoScaleSettings,
+    AutoScaleAlgorithm,
+    ResponseTimeAutoScaler,
+    RequestPerSecondAutoScaler
+} from './autoscaler';
 const setTimeoutPromise = promisify(setTimeout);
 
 let iterations = process.env.ITERATIONS as string;
@@ -26,58 +32,69 @@ fs.writeFileSync(SIMULATION_ID_FILE, simulationID.toString());
 console.info(`Simulation ID: ${simulationID}`);
 console.info(`Total iterations: ${iterations}`);
 
-async function runSimulation(iteration: Number) {
-    const simData = new SimulationData(simulationID)
-    const autoscaleSettings = new AutoScaleSettings()
+async function runSimulation(iteration: Number): Promise<SimulationData> {
+    return new Promise<SimulationData>((resolve, reject) => {
+        const simData = new SimulationData(simulationID)
 
-    console.info(`Starting iteration ${iteration}`);
+        console.info(`Starting iteration ${iteration}`);
 
-    simData.addProcess(startNginx(simData));
+        simData.addProcess(startNginx(simData));
 
-    const servers = startServers(simData);
+        const servers = startServers(simData);
 
-    servers.forEach(server => simData.addProcess(server))
+        servers.forEach(server => simData.addProcess(server))
 
-    // Start k6
-    const k6Process = k6(simulationID);
-    // Save reference to k6 process
-    simData.addProcess(k6Process);
+        // Start k6
+        const k6Process = k6(simulationID);
+        // Save reference to k6 process
+        simData.addProcess(k6Process);
 
-    // Autoscale number of servers
-    if (simData.autoScale) {
-        console.info('Autoscaling enabled')
-        // Start the auto-scaling scheduling
-        scheduleAutoScaling(simData, autoscaleSettings);
-    } else {
-        console.info('Autoscaling disabled')
-    }
+        // Autoscale number of servers
+        if (simData.autoScale) {
 
-    const k6Promise = new Promise((resolve, _reject) => {
+            let autoscaler: AutoScaleAlgorithm
+            const policy = process.env.AUTOSCALE_POLICY
+            switch (policy) {
+                case "RESPONSE_TIME":
+                    autoscaler = new ResponseTimeAutoScaler(new AutoScaleSettings(), simData, policy)
+                    break;
+                case "REQUESTS_PER_SECOND":
+                    autoscaler = new RequestPerSecondAutoScaler(new AutoScaleSettings(), simData, policy)
+                    break;
+                default:
+                    console.error('Define AUTOSCALE_POLICY to one of the supported values')
+                    return reject(simData);
+            }
+            console.info(`Autoscaling enabled with policy ${autoscaler.policy}`)
+            // Start the auto-scaling scheduling
+            scheduleAutoScaling(simData, autoscaler);
+        } else {
+            console.info('Autoscaling disabled')
+        }
+
         k6Process.on('close', (_code, _signal) => {
             console.info(`Finished iteration ${iteration}`);
             simData.stopSimulation();
-            resolve();
+            resolve(simData);
         })
     });
-
-    return k6Promise;
 }
 
 /**
  * Periodically check if we need to scale, waiting for the scaleServers function to finish
  * before scheduling the next
  */
-async function scheduleAutoScaling(simData: SimulationData, autoscaleSettings: AutoScaleSettings) {
+async function scheduleAutoScaling(simData: SimulationData, autoscaler: AutoScaleAlgorithm) {
 
     // Save as reference when we started the scaling operation
     const startingTime = Date.now()
 
-    scaleServers(simData, autoscaleSettings).then(async () => {
+    scaleServers(simData, autoscaler).then(async () => {
         // Calculate how much time has passed since we started scheduling
         const elapsed = Date.now() - startingTime;
 
         // Calculate the interval we need to wait before scheduling the next scaling operation
-        const sleepIntervalMs = autoscaleSettings.scaleIntervalMs - elapsed;
+        const sleepIntervalMs = autoscaler.settings.autoScaleIntervalMs - elapsed;
 
         // If we have a positive sleep interval, sleep for the remaining time
         if (sleepIntervalMs > 0) {
@@ -86,14 +103,19 @@ async function scheduleAutoScaling(simData: SimulationData, autoscaleSettings: A
             );
         }
         // Reschedule periodically the scale operation
-        scheduleAutoScaling(simData, autoscaleSettings);
+        scheduleAutoScaling(simData, autoscaler);
     })
 
 }
 
 async function main() {
     for (let i = 0; i < Number.parseInt(iterations); i++) {
-        await runSimulation(i);
+        try {
+            await runSimulation(i);
+        } catch (simulation) {
+            console.error("Error while running simulation")
+            simulation.stopSimulation(true)
+        }
     }
     console.log("Finished simulation");
 }

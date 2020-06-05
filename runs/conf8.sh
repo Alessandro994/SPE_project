@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e
+
 # Execute 5 replications with round-robin policy (same seed per replication).
 
 export SEED=1000000000
