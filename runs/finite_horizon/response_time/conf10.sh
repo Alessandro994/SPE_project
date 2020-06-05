@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-echo "Execute 5 replications with round-robin policy"
+echo "Execute 5 replications with random policy"
 
 export NUM_SERVERS=1
 export MIN_RESPONSE_TIME=500
@@ -12,7 +12,7 @@ export LAMBDA=0.01
 export K6_RPS=100
 export SIMULATE_SERVER_LOAD=true
 
-
+export LOAD_BALANCING=random
 
 export AUTOSCALE=true
 export AUTOSCALE_POLICY=RESPONSE_TIME

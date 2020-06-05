@@ -4,22 +4,11 @@ import numpy as np
 from influxdb_client import InfluxDBClient
 import pandas as pd
 
-from steady_state_response_time import (compute_mrt_for_simulation,
-                                        get_simulation_id)
+from steady_state_response_time import get_simulation_id
 
 
 client = InfluxDBClient(url="http://localhost:8086", token="my-token", org="BBM SpA")
 query_api = client.query_api()
-
-query = ('import "experimental"'
-         'from(bucket:"k6")'
-         '|> range(start: -1y)'
-         '|> filter(fn: (r) => r._measurement == "response_time" and r._field == "value" and r.simulation == "89")'
-         '|> group(columns: ["measurement"])'
-         '|> aggregateWindow(every: 500ms, fn: distinct, column: "server_id", createEmpty: false)'
-         '|> aggregateWindow(every: 500ms, fn: count, createEmpty: false)'
-         '|> map(fn: (r) => ({ r with _value: int(v: r._value) }))')
-
 
 if __name__ == "__main__":
 

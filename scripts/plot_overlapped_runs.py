@@ -4,8 +4,7 @@ import numpy as np
 import pandas as pd
 from influxdb_client import InfluxDBClient
 
-from steady_state_response_time import (compute_mrt_for_simulation,
-                                        get_simulation_id)
+from get_simulation_id import get_simulation_id
 
 client = InfluxDBClient(url="http://localhost:8086",
                         token="my-token", org="BBM SpA")

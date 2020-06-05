@@ -29,7 +29,7 @@ if __name__ == "__main__":
     else:
         for i in range(len(policies), 0, -1):
             sim_id = sim - (i - 1) * REPLICATION_NUM
-            print(f'Analyzing simulations [{sim_id - REPLICATION_NUM - 1}, {sim_id}]')
+            # print(f'Analyzing simulations [{sim_id - REPLICATION_NUM}, {sim_id}]')
 
             response_time = compute_mrt_for_simulation_fh(sim_id)
             averages_response_time.append(response_time.mean)
