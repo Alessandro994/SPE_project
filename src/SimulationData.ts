@@ -73,7 +73,7 @@ export class SimulationData {
     addProcess(process: ChildProcess) {
         process.on('close', (code, _signal) => {
             if (code) {
-                console.log(`Process exited with code ${code}. Shutting down simulation`);
+                console.log(`Process ${process.pid} exited with code ${code}. Shutting down simulation`);
                 this.stopSimulation(true)
             }
         })
