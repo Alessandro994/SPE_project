@@ -5,10 +5,11 @@ export SEED=1000000000
 export NUM_SERVERS=10
 export MIN_RESPONSE_TIME=500
 export EXP_RESPONSE_TIME=true
-export K6_ITERATIONS=40000
+export K6_ITERATIONS=10000
 export K6_VUS=300
 export LAMBDA=0.01
 export K6_RPS=100
+export SIMULATE_SERVER_LOAD=true
 
 echo "Starting round-robin"
 npm run simulation
