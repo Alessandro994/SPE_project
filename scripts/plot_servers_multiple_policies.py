@@ -6,7 +6,7 @@ import pandas as pd
 
 from steady_state_response_time import get_simulation_id
 
-RANGE = 10
+RANGE = 7
 AGGREGATE_DELTA = "4s"
 policies = ['round-robin', 'random', 'least-connected']
 
@@ -122,10 +122,35 @@ def plot_servers_over_time():
     return results
 
 
+# Plot all iterations of a single policy
+def plot_stacked_servers_over_time():
+
+    results = pd.DataFrame()
+
+    for i in range(0, RANGE):
+        sim_id = starting_simulation_id - i
+        print(f'Analyzing simulation {sim_id}')
+
+        num_servers = get_num_servers(sim_id, i + 1)
+
+        results = results.join(num_servers, how="outer")
+
+    new_serie = results.sum(axis=1).div(RANGE)
+
+    new_serie.plot()
+    plt.show()
+
+    results.plot()
+    plt.title("Number of servers over time")
+    plt.grid(True)
+    plt.show()
+
+    return results
+
 if __name__ == "__main__":
     starting_simulation_id = get_simulation_id()
 
-    results = plot_servers_over_time()
+    results = plot_stacked_servers_over_time()
 
     # get_confidence_intervals_policy(starting_simulation_id)
 
