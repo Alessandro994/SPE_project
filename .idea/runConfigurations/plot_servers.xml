@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="plot_servers_multiple_policies" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
+  <configuration default="false" name="plot_servers" type="PythonConfigurationType" factoryName="Python" folderName="plot_servers_over_time">
     <module name="SPE_project" />
     <option name="INTERPRETER_OPTIONS" value="" />
     <option name="PARENT_ENVS" value="true" />

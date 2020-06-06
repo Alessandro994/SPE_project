@@ -4,11 +4,10 @@ import matplotlib.pyplot as plt
 
 from get_simulation_id import get_simulation_id
 from steady_state_response_time import compute_mrt_for_simulation_ss
-from finite_horizon_response_time import compute_mrt_for_simulation_fh
+from finite_horizon_response_time import compute_mrt_for_simulation_fh, REPLICATIONS_NUM
 
 MIN_Y = 500
 
-REPLICATION_NUM = 5
 STEADY_STATE_ANALYSIS = False
 
 if __name__ == "__main__":
@@ -28,7 +27,7 @@ if __name__ == "__main__":
             ci_intervals.append(response_time.ci_interval_half_width)
     else:
         for i in range(len(policies), 0, -1):
-            sim_id = sim - (i - 1) * REPLICATION_NUM
+            sim_id = sim - (i - 1) * REPLICATIONS_NUM
             # print(f'Analyzing simulations [{sim_id - REPLICATION_NUM}, {sim_id}]')
 
             response_time = compute_mrt_for_simulation_fh(sim_id)

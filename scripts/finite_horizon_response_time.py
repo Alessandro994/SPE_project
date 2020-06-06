@@ -1,4 +1,5 @@
 import math
+import os
 
 import numpy as np
 from influxdb_client import InfluxDBClient
@@ -8,7 +9,7 @@ from DataObjects.MeanResponseTime import MeanResponseTime
 from get_simulation_id import get_simulation_id
 
 CI_LEVEL = 0.05
-REPLICATIONS_NUM = 5
+REPLICATIONS_NUM = int(os.environ.get("REPLICATIONS", 5))
 
 
 def compute_mrt_for_simulation_fh(simulation_id: int) -> MeanResponseTime:
