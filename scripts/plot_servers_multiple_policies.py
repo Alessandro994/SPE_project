@@ -6,7 +6,7 @@ import pandas as pd
 
 from steady_state_response_time import get_simulation_id
 
-RANGE = 10
+RANGE = 5
 AGGREGATE_DELTA = "4s"
 policies = ['round-robin', 'random', 'least-connected']
 
