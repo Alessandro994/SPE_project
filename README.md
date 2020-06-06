@@ -112,9 +112,10 @@ docker-compose exec influxdb influx -database k6 -execute 'DROP SERIES FROM /.*/
 docker-compose exec influxdb influxd backup -portable -db k6 /influx_backup
 
 ### Restore
-docker-compose exec influxdb -execute 'DROP DATABASE k6'
+```
+docker-compose exec influxdb influx -execute 'DROP DATABASE k6'
 docker-compose exec influxdb influxd restore -portable -db k6 /influx_backup
-
+```
 ## Limit CPU resources
 
 Use the following command
