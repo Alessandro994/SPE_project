@@ -1,7 +1,8 @@
 #!/bin/bash
 set -e
 
-echo "Execute 5 replications with least-connected policy"
+REPLICATIONS=${REPLICATIONS:-5}
+echo "Execute $REPLICATIONS replications with least-connected policy"
 
 export NUM_SERVERS=1
 export MIN_RESPONSE_TIME=500
@@ -22,9 +23,8 @@ export AUTOSCALE_LOOKUP_INTERVAL=20000
 export AUTOSCALE_ALGORITHM_INTERVAL=1000
 
 counter=0
-replications=5
 
-while [ $counter -lt $replications ]; do
+while [ $counter -lt "$REPLICATIONS" ]; do
   echo "Replication no. $counter"
   export SEED=$((1000000000 + counter))
   npm run simulation
