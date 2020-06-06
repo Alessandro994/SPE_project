@@ -56,16 +56,18 @@ def get_confidence_intervals_policy(starting_sim):
 
     confidence_interval_widths = variances.divide(RANGE).pow(1/2).multiply(eta)
 
-    # plt.errorbar(
-    #     x=results.reset_index()['time'].dt.seconds,
-    #     y=means,
-    #     yerr=confidence_interval_widths,
-    #     # Disable line between x data points
-    #     # ls='None',
-    #     # fmt='_',
-    #     lolims=True,
-    #     uplims=True,
+    # plt.plot(
+    #     results.reset_index()['time'].dt.seconds,
+    #     means,
+    #     'o'
     # )
+    # plt.fill_between(
+    #     results.reset_index()['time'].dt.seconds,
+    #     y1=means.sub(confidence_interval_widths),
+    #     y2=means.add(confidence_interval_widths),
+    #     alpha=0.2
+    # )
+    #
     # plt.title(f"Number of server over time (sim {starting_simulation_id})")
     # plt.grid(True)
     # plt.xlabel("Time (s)")
@@ -80,20 +82,20 @@ def plot_error_bar_all_policies():
     for i in range(len(policies)):
         means, confidence_intervals = get_confidence_intervals_policy(get_simulation_id() - i * RANGE)
 
-        plt.errorbar(
-            x=means.reset_index()['time'].dt.seconds,
-            y=means,
-            yerr=confidence_intervals,
-            # Disable line between x data points
-            linestyle='dashed',
-            # fmt='_',
-            lolims=True,
-            uplims=True,
-            capthick=0.1,
+        plt.plot(
+            means.reset_index()['time'].dt.seconds,
+            means,
+            # '.'
+        )
+        plt.fill_between(
+            means.reset_index()['time'].dt.seconds,
+            y1=means.sub(confidence_intervals),
+            y2=means.add(confidence_intervals),
+            alpha=0.2,
             label=policies[i]
         )
 
-    plt.title(f"Number of server over time")
+    plt.title(f"Average number of servers over time")
     plt.grid(True)
     plt.legend()
     plt.xlabel("Time (s)")
@@ -125,9 +127,9 @@ def plot_servers_over_time():
 if __name__ == "__main__":
     starting_simulation_id = get_simulation_id()
 
-    results = plot_servers_over_time()
+    # results = plot_servers_over_time()
 
     # get_confidence_intervals_policy(starting_simulation_id)
 
-    # plot_error_bar_all_policies()
+    plot_error_bar_all_policies()
 
