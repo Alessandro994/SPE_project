@@ -5,8 +5,8 @@ from influxdb_client import InfluxDBClient
 import pandas as pd
 
 from steady_state_response_time import get_simulation_id
+from finite_horizon_response_time import REPLICATIONS_NUM
 
-RANGE = 5
 AGGREGATE_DELTA = "4s"
 policies = ['round-robin', 'random', 'least-connected']
 
@@ -43,7 +43,7 @@ def get_confidence_intervals_policy(starting_sim):
 
     results = pd.DataFrame()
 
-    for i in range(0, RANGE):
+    for i in range(0, REPLICATIONS_NUM):
         sim_id = starting_sim - i
         print(f'Analyzing simulation {sim_id}')
 
@@ -54,7 +54,7 @@ def get_confidence_intervals_policy(starting_sim):
     means = results.mean(axis=1)
     variances = results.var(axis=1)
 
-    confidence_interval_widths = variances.divide(RANGE).pow(1/2).multiply(eta)
+    confidence_interval_widths = variances.divide(REPLICATIONS_NUM).pow(1/2).multiply(eta)
 
     # plt.plot(
     #     results.reset_index()['time'].dt.seconds,
@@ -80,7 +80,7 @@ def get_confidence_intervals_policy(starting_sim):
 # Plot all the error bars for all the policies on the same graph
 def plot_error_bar_all_policies():
     for i in range(len(policies)):
-        means, confidence_intervals = get_confidence_intervals_policy(get_simulation_id() - i * RANGE)
+        means, confidence_intervals = get_confidence_intervals_policy(get_simulation_id() - i * REPLICATIONS_NUM)
 
         plt.plot(
             means.reset_index()['time'].dt.seconds,
@@ -108,7 +108,7 @@ def plot_servers_over_time():
 
     results = pd.DataFrame()
 
-    for i in range(0, RANGE):
+    for i in range(0, REPLICATIONS_NUM):
         sim_id = starting_simulation_id - i
         print(f'Analyzing simulation {sim_id}')
 

@@ -2,7 +2,7 @@
 
 set -e
 
-export REPLICATIONS=10
+export REPLICATIONS=20
 
 ./runs/finite_horizon/requests_per_second/conf5.sh
 ./runs/finite_horizon/requests_per_second/conf6.sh
